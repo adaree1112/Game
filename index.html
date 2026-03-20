@@ -242,34 +242,6 @@
   }
   .cat-input-wrap input:focus { border-color: var(--accent); }
 
-  /* names list */
-  .names-list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .names-count { font-size: 11px; color: var(--muted); }
-  .names-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 6px; max-height: 280px; overflow-y: auto;
-    padding-right: 4px; margin-bottom: 14px;
-  }
-  .names-grid::-webkit-scrollbar { width: 4px; }
-  .names-grid::-webkit-scrollbar-track { background: transparent; }
-  .names-grid::-webkit-scrollbar-thumb { background: var(--btn); border-radius: 2px; }
-  .name-chip {
-    display: flex; align-items: center; justify-content: space-between;
-    background: var(--btn); border-radius: 4px;
-    padding: 6px 10px; font-size: 12px; color: var(--text);
-    border: 1px solid transparent;
-  }
-  .name-chip .chip-del {
-    color: var(--warn); cursor: pointer; font-size: 14px;
-    line-height: 1; margin-left: 8px; opacity: .6;
-    transition: opacity .15s;
-  }
-  .name-chip .chip-del:hover { opacity: 1; }
-  .add-name-row { display: flex; gap: 8px; }
-  .add-name-row input {
-    flex: 1; letter-spacing: 0; text-align: left; text-transform: none;
-    font-size: 13px;
-  }
   .settings-warn { color: var(--warn); font-size: 11px; margin: 6px 0; min-height: 16px; }
   .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
 
@@ -338,35 +310,39 @@
   input[type=password]:focus { border-color: var(--accent); }
   input[type=password]::placeholder { letter-spacing: 1px; color: var(--muted); font-size: 12px; }
   .entry-err { color: var(--warn); font-size: 11px; margin-top: 6px; min-height: 16px; }
+  /* ── PICKER TEXT INPUTS ── */
+  .picker-text-input {
+    flex: 1; background: #111128; border: 1px solid var(--btn);
+    color: var(--text); font-family: 'Share Tech Mono', monospace;
+    font-size: 14px; padding: 10px 14px; border-radius: 6px;
+    outline: none; letter-spacing: 0; text-align: left; text-transform: none;
+    transition: border-color .2s;
+  }
+  .picker-text-input:focus { border-color: var(--accent); }
+  .picker-text-input.filled { border-color: var(--cyan); color: var(--cyan); }
+  .picker-text-input::placeholder { color: var(--muted); font-size: 13px; }
+  .picker-slot-clear {
+    color: var(--warn); font-size: 13px; cursor: pointer;
+    opacity: .7; transition: opacity .15s; flex-shrink: 0;
+  }
+  .picker-slot-clear:hover { opacity: 1; }
+  .picker-slot-clear.hidden { visibility: hidden; }
+
   /* ── PICKER NAME TILES ── */
   .picker-tile {
     background: var(--btn); border: 1px solid transparent;
-    border-radius: 6px; padding: 10px 8px; text-align: center;
-    font-size: 12px; cursor: pointer;
-    transition: background .15s, border-color .15s, color .15s, transform .1s;
-    user-select: none;
+    border-radius: 5px; padding: 8px 6px; text-align: center;
+    font-size: 11px; cursor: pointer;
+    transition: background .12s, border-color .12s, color .12s;
+    user-select: none; white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .picker-tile:hover { background: var(--btnhov); }
-  .picker-tile.chosen {
-    background: rgba(0,229,255,.12); border-color: var(--cyan);
-    color: var(--cyan); font-weight: bold;
-  }
-  .picker-tile.chosen:hover { background: rgba(0,229,255,.2); }
-
-  /* ── PICKER REVEAL NAMES ── */
-  .reveal-name-row {
-    background: var(--card); border-radius: 8px; padding: 16px 20px;
-    display: flex; align-items: center; gap: 14px;
-    animation: fadein .4s ease;
-  }
-  .reveal-num {
-    font-family: 'Orbitron', monospace; font-size: 11px;
-    color: var(--muted); width: 20px; flex-shrink: 0;
-  }
-  .reveal-name {
-    font-family: 'Orbitron', monospace; font-size: 16px;
-    font-weight: 700; color: var(--text);
-  }
+  .picker-tile:hover:not(.tile-used) { background: var(--btnhov); border-color: var(--muted); }
+  .picker-tile.tile-chosen { border-color: var(--cyan); color: var(--cyan); background: rgba(0,229,255,.1); }
+  .picker-tile.tile-used { opacity: .3; cursor: default; }
+  #picker-name-grid::-webkit-scrollbar { width: 4px; }
+  #picker-name-grid::-webkit-scrollbar-track { background: transparent; }
+  #picker-name-grid::-webkit-scrollbar-thumb { background: var(--btn); border-radius: 2px; }
 
   /* ── GUESSER RESULT ── */
   .guess-result-card {
@@ -375,10 +351,56 @@
     font-size: 12px; animation: fadein .3s ease;
   }
 
-  /* scrollbar for picker grid */
-  #picker-name-grid::-webkit-scrollbar { width: 4px; }
-  #picker-name-grid::-webkit-scrollbar-track { background: transparent; }
-  #picker-name-grid::-webkit-scrollbar-thumb { background: var(--btn); border-radius: 2px; }
+  /* ── VARIANT TOGGLE ── */
+  .variant-toggle {
+    background: none; border: none; color: var(--muted);
+    font-family: 'Share Tech Mono', monospace; font-size: 11px;
+    font-weight: bold; letter-spacing: 1.5px; padding: 8px 16px;
+    border-radius: 6px; cursor: pointer; transition: background .15s, color .15s;
+    white-space: nowrap;
+  }
+  .variant-toggle.active {
+    background: var(--accent); color: var(--bg);
+  }
+  .variant-toggle:not(.active):hover { background: var(--btnhov); color: var(--text); }
+
+  /* ── OBO NAME REVEAL BOX (shared by guesser-p1 and compare OBO) ── */
+  .obo-reveal-box {
+    background: var(--card); border-radius: 10px; padding: 28px 32px;
+    text-align: center; margin: 20px 0; position: relative;
+  }
+  .obo-order-strip {
+    display: flex; gap: 6px; justify-content: center; margin-bottom: 18px;
+  }
+  .obo-order-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 1px solid var(--btn); color: var(--muted);
+    font-size: 11px; display: flex; align-items: center; justify-content: center;
+    transition: all .2s; font-family: 'Orbitron', monospace;
+  }
+  .obo-order-dot.active { border-color: var(--accent); color: var(--accent); background: rgba(224,64,251,.12); }
+  .obo-order-dot.done { border-color: var(--success); color: var(--success); background: rgba(105,240,174,.08); }
+
+  /* ── PICKER OBO DRAG ORDERING ── */
+  .drag-list { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+  .drag-item {
+    background: var(--card); border: 1px solid var(--btn); border-radius: 8px;
+    padding: 14px 16px; display: flex; align-items: center; gap: 14px;
+    cursor: grab; user-select: none; transition: border-color .15s, background .15s;
+  }
+  .drag-item:active { cursor: grabbing; }
+  .drag-item.drag-over { border-color: var(--cyan); background: rgba(0,229,255,.06); }
+  .drag-item.dragging { opacity: .4; }
+  .drag-handle { color: var(--muted); font-size: 16px; flex-shrink: 0; }
+  .drag-num {
+    font-family: 'Orbitron', monospace; font-size: 12px; color: var(--accent);
+    width: 20px; flex-shrink: 0;
+  }
+  .drag-name { font-family: 'Orbitron', monospace; font-size: 14px; font-weight: 700; }
+
+  /* ── NAMES LIST HEADER ── */
+  .names-list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .names-count { font-size: 11px; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -411,12 +433,21 @@
       <div class="section-label" style="margin-bottom:0;">NAME POOL</div>
       <div class="names-count" id="names-count">26 names</div>
     </div>
-    <div class="names-grid" id="names-grid"></div>
 
-    <div class="add-name-row">
-      <input type="text" id="new-name-input" placeholder="Add a name…" maxlength="30" style="letter-spacing:0;text-align:left;text-transform:none;font-size:13px;"/>
-      <button class="btn btn-accent" onclick="settingsAddName()">ADD</button>
-    </div>
+    <textarea id="names-textarea"
+      placeholder="Paste or type names here, separated by commas, tabs, or new lines…"
+      style="
+        width:100%; height:160px; background:#111128;
+        border:1px solid var(--btn); border-radius:4px;
+        color:var(--text); font-family:inherit; font-size:12px;
+        padding:10px 12px; outline:none; resize:vertical;
+        line-height:1.6; transition:border-color .2s;
+        letter-spacing:0; text-transform:none; text-align:left;
+      "
+      oninput="settingsPreviewNames()"
+      onfocus="this.style.borderColor='var(--accent)'"
+      onblur="this.style.borderColor='var(--btn)'"
+    ></textarea>
     <div class="settings-warn" id="settings-warn"></div>
 
     <div class="modal-footer">
@@ -489,27 +520,27 @@
     <button class="back-btn" onclick="showScreen('screen-entry')">← BACK</button>
     <button class="gear-btn" onclick="openSettings()" title="Settings">⚙</button>
   </div>
-  <div style="padding-top: 16px; padding-bottom: 24px;">
+  <div style="padding-top:12px; padding-bottom:8px;">
     <div class="title">✦ NAME PICKER ✦</div>
+  </div>
+
+  <!-- Global variant toggle -->
+  <div style="display:flex; justify-content:center; margin:12px 0 20px;">
+    <div style="
+      display:inline-flex; background:var(--btn); border-radius:8px; padding:3px; gap:3px;
+    ">
+      <button id="toggle-aao" class="variant-toggle active" onclick="setVariant('aao')">ALL AT ONCE</button>
+      <button id="toggle-obo" class="variant-toggle" onclick="setVariant('obo')">ONE BY ONE</button>
+    </div>
   </div>
 
   <div class="section-label">SINGLE PLAYER</div>
 
-  <div class="mode-card" onclick="soloStart('all_at_once')">
+  <div class="mode-card" onclick="soloStart('solo')">
     <span class="mode-tag tag-sp">SOLO</span>
-    <div class="card-title">ALL AT ONCE</div>
-    <div class="card-desc">
-      3 unique names revealed simultaneously.<br>
-      You have 1 swap per round. Assign one person per category.
-    </div>
-  </div>
-
-  <div class="mode-card" onclick="soloStart('one_by_one')">
-    <span class="mode-tag tag-sp">SOLO</span>
-    <div class="card-title">ONE BY ONE</div>
-    <div class="card-desc">
-      Names appear one at a time.<br>
-      Swap 1 name before assigning. Roles lock once chosen.
+    <div class="card-title" id="solo-card-title">ALL AT ONCE</div>
+    <div class="card-desc" id="solo-card-desc">
+      3 names revealed simultaneously. Assign one per category.
     </div>
   </div>
 
@@ -519,27 +550,24 @@
   <div class="mode-card" onclick="goLobby('picker')">
     <span class="mode-tag tag-mp">2 PLAYERS</span>
     <div class="card-title">PICKER</div>
-    <div class="card-desc">
-      Player 1 draws 3 names and assigns a category to each.<br>
-      Player 2 watches the reveal happen live.
+    <div class="card-desc" id="picker-card-desc">
+      P1 picks 3 names. P2 assigns them to categories.
     </div>
   </div>
 
   <div class="mode-card" onclick="goLobby('compare')">
     <span class="mode-tag tag-mp">2 PLAYERS</span>
     <div class="card-title">COMPARE RANKINGS</div>
-    <div class="card-desc">
-      Both players get the same 3 names and rank independently.<br>
-      Then see how your choices lined up.
+    <div class="card-desc" id="compare-card-desc">
+      Both players rank the same 3 names independently, then compare.
     </div>
   </div>
 
   <div class="mode-card" onclick="goLobby('guesser')">
     <span class="mode-tag tag-mp">2 PLAYERS</span>
     <div class="card-title">GUESSER</div>
-    <div class="card-desc">
-      Player 1 assigns categories to 3 names.<br>
-      Player 2 tries to guess Player 1's choices. Score points for matches!
+    <div class="card-desc" id="guesser-card-desc">
+      P2 assigns names secretly. P1 tries to guess the choices.
     </div>
   </div>
 </div>
@@ -646,45 +674,262 @@
 </div>
 
 <!-- ═══════════════════════════════════════════
-     SCREEN: PICKER (P1 — choose 3 names)
+     SCREEN: PICKER (P1 — pick 3 names)
 ═══════════════════════════════════════════ -->
 <div class="screen" id="screen-picker-host">
   <div class="top-bar">
     <button class="back-btn" onclick="mpMenu()">← MENU</button>
-    <span id="picker-count-label" style="font-size:12px; color:var(--cyan);">0 / 3 chosen</span>
+    <span id="picker-count-label" style="font-size:12px; color:var(--cyan);">0 / 3</span>
   </div>
   <div class="title" style="font-size:16px; letter-spacing:2px;">PICKER — YOU ARE P1</div>
-  <div class="subtitle mt8">Pick exactly 3 names from the list. P2 will see your choices.</div>
+  <div class="subtitle mt8">Tap a name to select it, or type freely in the boxes. P2 will assign them.</div>
 
+  <!-- Name pool grid -->
   <div id="picker-name-grid" style="
-    display:grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr));
-    gap:8px; margin:20px 0; max-height:380px; overflow-y:auto;
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(110px,1fr));
+    gap:7px; margin:16px 0 12px; max-height:240px; overflow-y:auto;
     padding-right:4px;
   "></div>
 
+  <div class="divider" style="margin:12px 0;"></div>
+
+  <!-- 3 selection slots -->
+  <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="font-family:'Orbitron',monospace; font-size:12px; color:var(--accent); width:18px; text-align:right; flex-shrink:0;">1</span>
+      <input type="text" id="picker-input-1" class="picker-text-input" placeholder="—" maxlength="40" autocomplete="off" oninput="pickerInputChanged(0)" onfocus="pickerInputFocused(0)"/>
+      <span id="picker-clear-1" class="picker-slot-clear hidden" onclick="pickerClearSlot(0)">✕</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="font-family:'Orbitron',monospace; font-size:12px; color:var(--accent); width:18px; text-align:right; flex-shrink:0;">2</span>
+      <input type="text" id="picker-input-2" class="picker-text-input" placeholder="—" maxlength="40" autocomplete="off" oninput="pickerInputChanged(1)" onfocus="pickerInputFocused(1)"/>
+      <span id="picker-clear-2" class="picker-slot-clear hidden" onclick="pickerClearSlot(1)">✕</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="font-family:'Orbitron',monospace; font-size:12px; color:var(--accent); width:18px; text-align:right; flex-shrink:0;">3</span>
+      <input type="text" id="picker-input-3" class="picker-text-input" placeholder="—" maxlength="40" autocomplete="off" oninput="pickerInputChanged(2)" onfocus="pickerInputFocused(2)"/>
+      <span id="picker-clear-3" class="picker-slot-clear hidden" onclick="pickerClearSlot(2)">✕</span>
+    </div>
+  </div>
+
   <div class="warn-text" id="picker-warn"></div>
   <div class="btn-row">
-    <button class="btn" onclick="pickerClearAll()">✕ CLEAR</button>
+    <button class="btn" onclick="pickerClearAll()">✕ CLEAR ALL</button>
     <button class="btn btn-accent" onclick="pickerConfirm()">✓ CONFIRM</button>
   </div>
 </div>
 
 <!-- ═══════════════════════════════════════════
-     SCREEN: PICKER (guest / P2 — sees the reveal)
+     SCREEN: PICKER (P2 — assign categories)
 ═══════════════════════════════════════════ -->
 <div class="screen" id="screen-picker-guest">
   <div class="top-bar">
     <button class="back-btn" onclick="mpMenu()">← MENU</button>
   </div>
   <div class="title" style="font-size:16px; letter-spacing:2px;">PICKER — YOU ARE P2</div>
+
+  <!-- waiting state -->
   <div id="picker-guest-waiting" class="waiting-msg pulse">Waiting for Player 1 to choose names…</div>
-  <div id="picker-guest-result" style="display:none;">
-    <div class="success-text" style="margin-bottom:8px;">✦ PLAYER 1 CHOSE ✦</div>
-    <div id="picker-guest-names" style="display:flex; flex-direction:column; gap:10px; margin:16px 0;"></div>
+
+  <!-- assignment phase -->
+  <div id="picker-guest-assign" style="display:none;">
+    <div class="subtitle mt8">Assign each name to a category.</div>
+    <div class="name-cards-row" id="picker-guest-cards"></div>
+    <div class="divider"></div>
+    <div class="assign-table" id="picker-guest-assign-table"></div>
+    <div class="warn-text" id="picker-guest-warn"></div>
+    <div class="btn-row">
+      <button class="btn btn-accent" onclick="pickerGuestConfirm()">✓ CONFIRM</button>
+    </div>
   </div>
-  <div class="btn-row" id="picker-guest-btns" style="display:none;">
-    <button class="btn" onclick="guestRequestNewRound()">↺ PLAY AGAIN</button>
-    <button class="btn" onclick="mpMenu()">⌂ MENU</button>
+
+  <!-- result phase (shown to both after P2 confirms) -->
+  <div id="picker-guest-result" style="display:none;">
+    <div class="success-text">✦ RESULT ✦</div>
+    <div class="assign-table" id="picker-guest-result-table"></div>
+    <div class="btn-row" id="picker-guest-btns">
+      <button class="btn" onclick="guestRequestNewRound()">↺ PLAY AGAIN</button>
+      <button class="btn" onclick="mpMenu()">⌂ MENU</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN: PICKER OBO — P1 drags to order
+═══════════════════════════════════════════ -->
+<div class="screen" id="screen-picker-obo-host">
+  <div class="top-bar">
+    <button class="back-btn" onclick="mpMenu()">← MENU</button>
+  </div>
+  <div class="title" style="font-size:16px; letter-spacing:2px;">PICKER — YOU ARE P1</div>
+  <div class="subtitle mt8">Pick 3 names, then drag to set the order P2 will see them.</div>
+
+  <!-- name pool grid (same as AAO) -->
+  <div id="picker-obo-name-grid" style="
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(110px,1fr));
+    gap:7px; margin:16px 0 12px; max-height:220px; overflow-y:auto; padding-right:4px;
+  "></div>
+  <div class="divider" style="margin:10px 0;"></div>
+
+  <!-- drag-to-order list -->
+  <div class="section-label">DRAG TO SET ORDER</div>
+  <div class="drag-list" id="picker-obo-drag-list">
+    <div class="drag-item" data-idx="0" draggable="true">
+      <span class="drag-handle">⠿</span><span class="drag-num">1</span>
+      <span class="drag-name" id="picker-obo-slot-0">—</span>
+    </div>
+    <div class="drag-item" data-idx="1" draggable="true">
+      <span class="drag-handle">⠿</span><span class="drag-num">2</span>
+      <span class="drag-name" id="picker-obo-slot-1">—</span>
+    </div>
+    <div class="drag-item" data-idx="2" draggable="true">
+      <span class="drag-handle">⠿</span><span class="drag-num">3</span>
+      <span class="drag-name" id="picker-obo-slot-2">—</span>
+    </div>
+  </div>
+
+  <div class="warn-text" id="picker-obo-warn"></div>
+  <div class="btn-row">
+    <button class="btn" onclick="pickerOboClearAll()">✕ CLEAR</button>
+    <button class="btn btn-accent" onclick="pickerOboConfirm()">✓ CONFIRM ORDER</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN: PICKER OBO — P2 assigns one by one
+═══════════════════════════════════════════ -->
+<div class="screen" id="screen-picker-obo-guest">
+  <div class="top-bar">
+    <button class="back-btn" onclick="mpMenu()">← MENU</button>
+  </div>
+  <div class="title" style="font-size:16px; letter-spacing:2px;">PICKER — YOU ARE P2</div>
+  <div id="picker-obo-guest-waiting" class="waiting-msg pulse">Waiting for Player 1 to choose and order names…</div>
+  <div id="picker-obo-guest-active" style="display:none;">
+    <div class="obo-reveal-box">
+      <div class="obo-order-strip" id="picker-obo-dots"></div>
+      <div class="current-name-label">ASSIGN THIS NAME</div>
+      <div class="current-name-big" id="picker-obo-current-name">—</div>
+    </div>
+    <div class="cat-btns" id="picker-obo-cat-btns"></div>
+    <div class="divider"></div>
+    <div class="assign-table" id="picker-obo-assign-table"></div>
+  </div>
+  <div id="picker-obo-guest-result" style="display:none;">
+    <div class="success-text">✦ RESULT ✦</div>
+    <div class="assign-table" id="picker-obo-result-table"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="guestRequestNewRound()">↺ PLAY AGAIN</button>
+      <button class="btn" onclick="mpMenu()">⌂ MENU</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN: GUESSER OBO — P1 guesses one by one
+═══════════════════════════════════════════ -->
+<div class="screen" id="screen-guesser-obo-p1">
+  <div class="top-bar">
+    <button class="back-btn" onclick="mpMenu()">← MENU</button>
+  </div>
+  <div class="title" style="font-size:16px; letter-spacing:2px;">GUESSER — YOU ARE P1</div>
+
+  <div id="guesser-obo-p1-waiting" class="waiting-msg pulse">Waiting for Player 2 to assign names…</div>
+
+  <div id="guesser-obo-p1-active" style="display:none;">
+    <div class="subtitle mt8">All 3 names shown in P2's order. Guess each category.</div>
+    <div class="name-cards-row" id="guesser-obo-p1-cards"></div>
+    <div class="divider"></div>
+    <div class="assign-table" id="guesser-obo-p1-table"></div>
+    <div class="warn-text" id="guesser-obo-p1-warn"></div>
+    <div class="btn-row">
+      <button class="btn btn-accent" onclick="gOboP1Submit()">✓ SUBMIT GUESSES</button>
+    </div>
+  </div>
+
+  <div id="guesser-obo-p1-submitted" style="display:none;" class="waiting-msg pulse">
+    All guesses submitted! Waiting for P2 to reveal…
+  </div>
+
+  <div id="guesser-obo-p1-result" style="display:none;">
+    <div class="success-text">✦ YOUR SCORE ✦</div>
+    <div id="guesser-obo-p1-result-content"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="guesserP1RequestNew()">↺ NEW ROUND</button>
+      <button class="btn" onclick="mpMenu()">⌂ MENU</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN: GUESSER OBO — P2 assigns one by one
+═══════════════════════════════════════════ -->
+<div class="screen" id="screen-guesser-obo-p2">
+  <div class="top-bar">
+    <button class="back-btn" onclick="mpMenu()">← MENU</button>
+    <span id="guesser-obo-p2-swap-label" style="font-size:12px; color:var(--cyan);">SWAPS: 1/1</span>
+  </div>
+  <div class="title" style="font-size:16px; letter-spacing:2px;">GUESSER — YOU ARE P2</div>
+  <div class="subtitle mt8">Assign names one at a time. P1 will guess!</div>
+
+  <div id="guesser-obo-p2-active">
+    <div class="obo-reveal-box">
+      <div class="obo-order-strip" id="guesser-obo-p2-dots"></div>
+      <div class="current-name-label">ASSIGN THIS NAME</div>
+      <div class="current-name-big" id="guesser-obo-p2-name">—</div>
+      <span id="guesser-obo-p2-swap-x" class="swap-x" style="position:absolute;top:10px;right:14px;" onclick="guesserOboP2Swap()">✕</span>
+    </div>
+    <div class="cat-btns" id="guesser-obo-p2-cat-btns"></div>
+    <div class="divider"></div>
+    <div class="assign-table" id="guesser-obo-p2-table"></div>
+  </div>
+
+  <div id="guesser-obo-p2-waiting" style="display:none;" class="waiting-msg pulse">P1 is guessing… stand by!</div>
+
+  <div id="guesser-obo-p2-result" style="display:none;">
+    <div class="success-text">✦ P1's GUESSES ✦</div>
+    <div id="guesser-obo-p2-result-content"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="guesserP2RequestNew()">↺ NEW ROUND</button>
+      <button class="btn" onclick="mpMenu()">⌂ MENU</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN: COMPARE OBO — one name at a time
+═══════════════════════════════════════════ -->
+<div class="screen" id="screen-compare-obo">
+  <div class="top-bar">
+    <button class="back-btn" onclick="mpMenu()">← MENU</button>
+    <span id="compare-obo-role-label" style="font-size:11px; color:var(--cyan);"></span>
+  </div>
+  <div class="title" style="font-size:16px; letter-spacing:2px;">COMPARE — ONE BY ONE</div>
+
+  <div id="compare-obo-active">
+    <div class="subtitle mt8">Assign each name as it appears. Don't show your partner!</div>
+    <div class="obo-reveal-box">
+      <div class="obo-order-strip" id="compare-obo-dots"></div>
+      <div class="current-name-label">ASSIGN THIS NAME</div>
+      <div class="current-name-big" id="compare-obo-name">—</div>
+    </div>
+    <div class="cat-btns" id="compare-obo-cat-btns"></div>
+    <div class="divider"></div>
+    <div class="assign-table" id="compare-obo-table"></div>
+  </div>
+
+  <div id="compare-obo-waiting" style="display:none;" class="waiting-msg pulse">Waiting for your partner…</div>
+
+  <div id="compare-obo-results" style="display:none;">
+    <div class="success-text mt16">✦ RESULTS ✦</div>
+    <div class="compare-grid" id="compare-obo-results-grid"></div>
+    <div class="center mt16">
+      <div class="small">Matches:</div>
+      <div class="score-big" id="compare-obo-match-score">0/3</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="compareNewRound()">↺ NEW ROUND</button>
+      <button class="btn" onclick="mpMenu()">⌂ MENU</button>
+    </div>
   </div>
 </div>
 
@@ -726,70 +971,81 @@
 </div>
 
 <!-- ═══════════════════════════════════════════
-     SCREEN: GUESSER P1
+     SCREEN: GUESSER P1 (the guesser)
 ═══════════════════════════════════════════ -->
 <div class="screen" id="screen-guesser-p1">
   <div class="top-bar">
     <button class="back-btn" onclick="mpMenu()">← MENU</button>
-    <span id="guesser-p1-swap-label" style="font-size:12px; color:var(--cyan);">SWAPS: 1/1</span>
   </div>
   <div class="title" style="font-size:16px; letter-spacing:2px;">GUESSER — YOU ARE P1</div>
-  <div class="subtitle mt8">Assign names secretly. P2 will try to guess your choices!</div>
+  <div class="subtitle mt8">Guess what categories P2 assigned to each name!</div>
 
-  <div id="guesser-p1-assign-phase">
+  <!-- waiting for P2 to assign -->
+  <div id="guesser-p1-waiting" class="waiting-msg pulse">
+    Waiting for Player 2 to assign names…
+  </div>
+
+  <!-- guess phase -->
+  <div id="guesser-p1-guess-phase" style="display:none;">
     <div class="name-cards-row" id="guesser-p1-cards"></div>
     <div class="divider"></div>
     <div class="assign-table" id="guesser-p1-assign-table"></div>
     <div class="warn-text" id="guesser-p1-warn"></div>
     <div class="btn-row">
-      <button class="btn" onclick="guesserP1NewRound()">↺ NEW ROUND</button>
-      <button class="btn btn-accent" onclick="guesserP1Confirm()">✓ CONFIRM</button>
+      <button class="btn btn-accent" onclick="guesserP1SubmitGuess()">✓ SUBMIT GUESSES</button>
     </div>
   </div>
 
-  <div id="guesser-p1-waiting" style="display:none;" class="waiting-msg pulse">
-    P2 is guessing… stand by!
+  <!-- submitted, waiting for result -->
+  <div id="guesser-p1-submitted" style="display:none;" class="waiting-msg pulse">
+    Guesses submitted! Waiting for P2 to reveal…
   </div>
 
+  <!-- result phase -->
   <div id="guesser-p1-result-phase" style="display:none;">
-    <div class="success-text">✦ P2's GUESSES ✦</div>
+    <div class="success-text">✦ YOUR SCORE ✦</div>
     <div id="guesser-p1-result-content"></div>
     <div class="btn-row">
-      <button class="btn" onclick="guesserP1NewRound()">↺ NEW ROUND</button>
+      <button class="btn" onclick="guesserP1RequestNew()">↺ NEW ROUND</button>
       <button class="btn" onclick="mpMenu()">⌂ MENU</button>
     </div>
   </div>
 </div>
 
 <!-- ═══════════════════════════════════════════
-     SCREEN: GUESSER P2
+     SCREEN: GUESSER P2 (the assigner)
 ═══════════════════════════════════════════ -->
 <div class="screen" id="screen-guesser-p2">
   <div class="top-bar">
     <button class="back-btn" onclick="mpMenu()">← MENU</button>
+    <span id="guesser-p2-swap-label" style="font-size:12px; color:var(--cyan);">SWAPS: 1/1</span>
   </div>
   <div class="title" style="font-size:16px; letter-spacing:2px;">GUESSER — YOU ARE P2</div>
+  <div class="subtitle mt8">Assign names secretly. P1 will try to guess your choices!</div>
 
-  <div id="guesser-p2-waiting" class="waiting-msg pulse">
-    Waiting for Player 1 to assign names…
-  </div>
-
-  <div id="guesser-p2-guess-phase" style="display:none;">
-    <div class="subtitle mt8">Guess what categories P1 assigned to each name!</div>
+  <!-- assign phase -->
+  <div id="guesser-p2-assign-phase">
     <div class="name-cards-row" id="guesser-p2-cards"></div>
     <div class="divider"></div>
     <div class="assign-table" id="guesser-p2-assign-table"></div>
     <div class="warn-text" id="guesser-p2-warn"></div>
     <div class="btn-row">
-      <button class="btn btn-accent" onclick="guesserP2Confirm()">✓ SUBMIT GUESSES</button>
+      <button class="btn" onclick="guesserP2NewRound()">↺ NEW ROUND</button>
+      <button class="btn btn-accent" onclick="guesserP2Confirm()">✓ CONFIRM</button>
     </div>
   </div>
 
+  <!-- waiting for P1 to guess -->
+  <div id="guesser-p2-waiting" style="display:none;" class="waiting-msg pulse">
+    P1 is guessing… stand by!
+  </div>
+
+  <!-- result phase -->
   <div id="guesser-p2-result-phase" style="display:none;">
-    <div class="waiting-msg pulse" id="guesser-p2-submitted-msg" style="margin-top:40px;">Guesses submitted! Waiting for P1 to reveal…</div>
-    <div id="guesser-p2-result-content" style="display:none;"></div>
-    <div class="btn-row" id="guesser-p2-result-btns" style="display:none;">
-      <button class="btn" onclick="guesserP2RequestNew()">↺ PLAY AGAIN</button>
+    <div class="success-text">✦ P1's GUESSES ✦</div>
+    <div id="guesser-p2-result-content"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="guesserP2RequestNew()">↺ NEW ROUND</button>
       <button class="btn" onclick="mpMenu()">⌂ MENU</button>
     </div>
   </div>
@@ -819,20 +1075,20 @@ let peer = null, conn = null;
 let myRole = null;       // 'host' | 'guest'
 let currentMode = null;
 let thisGameP1 = null;   // 'host' | 'guest' — resolved after coin flip
+let gameVariant = 'aao'; // 'aao' | 'obo'
 
 // solo
 let soloAllNames = [], soloAllAssignments = {}, soloAllSwapsLeft = 1;
 let soloOboQueue = [], soloOboCurrent = '', soloOboAssigned = [], soloOboAssignments = {}, soloOboSwapsLeft = 1;
 
 // picker mp
-let pickerNames = [], pickerAssignments = {}, pickerSwapsLeft = 1;
+// picker state: 3 text inputs, no pre-state needed
 
 // compare mp
 let compareNames = [], compareMyAssignments = {}, compareTheirAssignments = {};
 let compareMyLocked = false, compareTheirLocked = false, compareSwapsLeft = 1;
 
-// guesser mp
-let guesserNames = [], guesserP1Assignments = {}, guesserP2Guesses = {}, guesserP1SwapsLeft = 1;
+// guesser state declared near guesserP2Init / guesserP1Init
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  SCREEN ROUTING
@@ -849,6 +1105,34 @@ function goHome() {
   if (peer) { try { peer.destroy(); } catch(e){} peer = null; }
   myRole = null; currentMode = null; thisGameP1 = null;
   showScreen('screen-entry');
+}
+
+function setVariant(v) {
+  gameVariant = v;
+  document.getElementById('toggle-aao').classList.toggle('active', v === 'aao');
+  document.getElementById('toggle-obo').classList.toggle('active', v === 'obo');
+
+  // Update card descriptions
+  const descs = {
+    aao: {
+      solo:    '3 names revealed simultaneously. Assign one per category.',
+      picker:  'P1 picks 3 names. P2 assigns them to categories all at once.',
+      compare: 'Both players rank the same 3 names independently, then compare.',
+      guesser: 'P2 assigns 3 names secretly. P1 guesses all at once.'
+    },
+    obo: {
+      solo:    'Names appear one at a time. Assign each before seeing the next.',
+      picker:  'P1 picks 3 names and sets the order. P2 assigns them one by one.',
+      compare: 'Both players assign names one at a time as they appear.',
+      guesser: 'P2 assigns names one at a time. P1 guesses each as they appear.'
+    }
+  };
+  const d = descs[v];
+  document.getElementById('solo-card-title').textContent  = v === 'aao' ? 'ALL AT ONCE' : 'ONE BY ONE';
+  document.getElementById('solo-card-desc').textContent   = d.solo;
+  document.getElementById('picker-card-desc').textContent = d.picker;
+  document.getElementById('compare-card-desc').textContent= d.compare;
+  document.getElementById('guesser-card-desc').textContent= d.guesser;
 }
 
 // Host returns to mode-select KEEPING the connection alive
@@ -929,42 +1213,36 @@ function openSettings() {
   document.getElementById('cat-b-input').value = CATEGORIES[1];
   document.getElementById('cat-c-input').value = CATEGORIES[2];
   document.getElementById('settings-warn').textContent = '';
-  renderNamesGrid();
+  // Populate textarea with current names, one per line
+  document.getElementById('names-textarea').value = NAMES.join('\n');
+  document.getElementById('names-count').textContent = `${NAMES.length} names`;
   document.getElementById('settings-modal').classList.add('open');
 }
 function closeSettings() { document.getElementById('settings-modal').classList.remove('open'); }
 
-function renderNamesGrid() {
-  const grid = document.getElementById('names-grid');
-  grid.innerHTML = '';
-  document.getElementById('names-count').textContent = `${NAMES.length} names`;
-  NAMES.forEach(name => {
-    const chip = document.createElement('div');
-    chip.className = 'name-chip';
-    chip.innerHTML = `<span>${name}</span><span class="chip-del" onclick="settingsRemoveName('${name.replace(/'/g, "\\'")}')">×</span>`;
-    grid.appendChild(chip);
-  });
+function parseNamesFromTextarea() {
+  const raw = document.getElementById('names-textarea').value;
+  // Split on newlines, tabs, or commas; trim and filter blanks; deduplicate case-insensitively
+  const seen = new Set();
+  return raw.split(/[\n\t,]+/)
+    .map(s => s.trim())
+    .filter(s => s.length > 0)
+    .filter(s => {
+      const key = s.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
 }
 
-function settingsRemoveName(name) {
-  if (NAMES.length <= 3) { document.getElementById('settings-warn').textContent = 'Need at least 3 names.'; return; }
-  NAMES = NAMES.filter(n => n !== name);
-  document.getElementById('settings-warn').textContent = '';
-  renderNamesGrid();
-}
-
-function settingsAddName() {
-  const input = document.getElementById('new-name-input');
-  const val = input.value.trim();
-  if (!val) return;
-  if (NAMES.map(n=>n.toLowerCase()).includes(val.toLowerCase())) {
-    document.getElementById('settings-warn').textContent = `"${val}" is already in the list.`;
-    return;
+function settingsPreviewNames() {
+  const names = parseNamesFromTextarea();
+  document.getElementById('names-count').textContent = `${names.length} names`;
+  if (names.length < 3) {
+    document.getElementById('settings-warn').textContent = 'Need at least 3 names.';
+  } else {
+    document.getElementById('settings-warn').textContent = '';
   }
-  NAMES.push(val);
-  input.value = '';
-  document.getElementById('settings-warn').textContent = '';
-  renderNamesGrid();
 }
 
 function settingsSave() {
@@ -975,7 +1253,12 @@ function settingsSave() {
   if (new Set([a.toLowerCase(),b.toLowerCase(),c.toLowerCase()]).size < 3) {
     document.getElementById('settings-warn').textContent = 'Categories must be unique.'; return;
   }
+  const names = parseNamesFromTextarea();
+  if (names.length < 3) {
+    document.getElementById('settings-warn').textContent = 'Need at least 3 names.'; return;
+  }
   CATEGORIES = [a, b, c];
+  NAMES = names;
   closeSettings();
 }
 
@@ -984,8 +1267,9 @@ function settingsReset() {
   document.getElementById('cat-a-input').value = CATEGORIES[0];
   document.getElementById('cat-b-input').value = CATEGORIES[1];
   document.getElementById('cat-c-input').value = CATEGORIES[2];
+  document.getElementById('names-textarea').value = NAMES.join('\n');
+  document.getElementById('names-count').textContent = `${NAMES.length} names`;
   document.getElementById('settings-warn').textContent = '';
-  renderNamesGrid();
 }
 
 document.getElementById('settings-modal').addEventListener('click', function(e) {
@@ -993,9 +1277,12 @@ document.getElementById('settings-modal').addEventListener('click', function(e) 
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('new-name-input').addEventListener('keydown', e => { if (e.key==='Enter') settingsAddName(); });
   document.getElementById('entry-password-input').addEventListener('keydown', e => { if (e.key==='Enter') submitHostPassword(); });
   document.getElementById('entry-join-code').addEventListener('keydown', e => { if (e.key==='Enter') submitJoinCode(); });
+  // Picker: Enter moves to next slot or confirms on slot 3
+  document.getElementById('picker-input-1').addEventListener('keydown', e => { if (e.key==='Enter') document.getElementById('picker-input-2').focus(); });
+  document.getElementById('picker-input-2').addEventListener('keydown', e => { if (e.key==='Enter') document.getElementById('picker-input-3').focus(); });
+  document.getElementById('picker-input-3').addEventListener('keydown', e => { if (e.key==='Enter') pickerConfirm(); });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1061,6 +1348,32 @@ function buildNameCards(containerId, names, assignments, onAssign, swapsLeft, on
   });
 }
 
+// Like buildNameCards but shows an order number badge on each card
+function buildNameCardsNumbered(containerId, names, assignments, onAssign) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  names.forEach((name, i) => {
+    const card = document.createElement('div');
+    card.className = 'name-card';
+    // Order badge
+    const badge = document.createElement('div');
+    badge.style.cssText = 'font-family:"Orbitron",monospace;font-size:10px;color:var(--accent);text-align:center;margin-bottom:4px;letter-spacing:1px;';
+    badge.textContent = `#${i + 1}`;
+    card.appendChild(badge);
+    const nameLabel = document.createElement('div');
+    nameLabel.className = 'card-name'; nameLabel.textContent = name;
+    card.appendChild(nameLabel);
+    CATEGORIES.forEach(cat => {
+      const opt = document.createElement('span');
+      opt.className = 'radio-opt' + (assignments[cat]===name ? ' selected' : '');
+      opt.textContent = cat; opt.dataset.cat = cat; opt.dataset.cardIdx = i;
+      opt.onclick = () => onAssign(name, cat, i, containerId, assignments, names);
+      card.appendChild(opt);
+    });
+    container.appendChild(card);
+  });
+}
+
 function onAssignGeneric(name, cat, idx, containerId, assignments, names) {
   for (const c of CATEGORIES) if (assignments[c] === name) assignments[c] = null;
   for (const c of CATEGORIES) if (c===cat && assignments[c] && assignments[c]!==name) assignments[c]=null;
@@ -1087,7 +1400,7 @@ function buildCatButtons(containerId, disabledCats, onAssign) {
 //  SOLO — ALL AT ONCE
 // ─────────────────────────────────────────────────────────────────────────────
 function soloStart(mode) {
-  if (mode==='all_at_once') { soloAllInit(randomNames()); showScreen('screen-solo-all'); }
+  if (gameVariant === 'aao') { soloAllInit(randomNames()); showScreen('screen-solo-all'); }
   else { soloOboNewRound(); showScreen('screen-solo-obo'); }
 }
 
@@ -1168,17 +1481,21 @@ function randCode() {
 
 function goLobby(mode) {
   currentMode = mode;
-  const tags = { picker:'PICKER', compare:'COMPARE', guesser:'GUESSER' };
-  document.getElementById('lobby-mode-tag').textContent = tags[mode];
+  const labels = { picker:'PICKER', compare:'COMPARE', guesser:'GUESSER' };
+  const variantLabel = gameVariant === 'obo' ? ' OBO' : '';
+  document.getElementById('lobby-mode-tag').textContent = labels[mode] + variantLabel;
   if (conn && conn.open) {
-    // Already connected — just show lobby, update status
+    // P2 already connected — go straight to the game
     document.getElementById('host-status').textContent = 'Player 2 connected!';
     document.getElementById('host-status').className = 'status-badge badge-ok mt8';
     document.getElementById('start-game-btn').disabled = false;
+    showScreen('screen-lobby');
+    // Brief pause so the lobby flashes, then auto-start
+    setTimeout(hostStartGame, 600);
   } else {
     startHost();
+    showScreen('screen-lobby');
   }
-  showScreen('screen-lobby');
 }
 
 function startHost() {
@@ -1192,9 +1509,11 @@ function startHost() {
   peer.on('error', e => { if (e.type==='unavailable-id') { peer.destroy(); startHost(); } });
   peer.on('connection', c => {
     conn = c; setupConn();
-    document.getElementById('host-status').textContent = 'Player 2 connected!';
+    document.getElementById('host-status').textContent = 'Player 2 connected! Starting…';
     document.getElementById('host-status').className = 'status-badge badge-ok mt8';
     document.getElementById('start-game-btn').disabled = false;
+    // Auto-start after a brief moment so P2 can see they're connected
+    setTimeout(hostStartGame, 800);
   });
 }
 
@@ -1215,19 +1534,19 @@ function send(msg) { if (conn && conn.open) conn.send(msg); }
 function isAsymmetric(mode) { return mode==='picker' || mode==='guesser'; }
 
 function hostStartGame() {
-  const names = randomNames(); // used by compare/guesser; picker ignores this
+  const names = randomNames();
   if (isAsymmetric(currentMode)) {
     const winner = Math.random() < 0.5 ? 'host' : 'guest';
     thisGameP1 = winner;
-    send({ type:'coinflip', winner, mode:currentMode, categories:CATEGORIES });
+    send({ type:'coinflip', winner, mode:currentMode, variant:gameVariant, categories:CATEGORIES });
     showCoinFlipScreen(winner, 'host', () => {
-      const startMsg = { type:'start', mode:currentMode, names, categories:CATEGORIES, p1:winner };
+      const startMsg = { type:'start', mode:currentMode, variant:gameVariant, names, categories:CATEGORIES, p1:winner };
       send(startMsg);
       launchGame(names, winner==='host' ? 'host_p1' : 'host_p2');
     });
   } else {
     thisGameP1 = 'host';
-    const startMsg = { type:'start', mode:currentMode, names, categories:CATEGORIES, p1:'host' };
+    const startMsg = { type:'start', mode:currentMode, variant:gameVariant, names, categories:CATEGORIES, p1:'host' };
     send(startMsg);
     launchGame(names, 'host');
   }
@@ -1261,8 +1580,8 @@ function showCoinFlipScreen(winner, perspective, callback) {
     winnerEl.style.color = isMe ? 'var(--success)' : 'var(--accent)';
 
     const modeRoles = {
-      picker:  { p1: 'assign the names', p2: 'watch the reveal' },
-      guesser: { p1: 'assign names secretly', p2: 'try to guess' }
+      picker:  { p1: 'choose the names', p2: 'assign categories' },
+      guesser: { p1: 'guess the categories', p2: 'assign names secretly' }
     };
     const roles = modeRoles[currentMode] || { p1:'go first', p2:'go second' };
     roleDesc.textContent = isMe ? `You will ${roles.p1}` : `You will ${roles.p2}`;
@@ -1286,20 +1605,21 @@ function handleMessage(msg) {
       break;
     case 'coinflip':
       currentMode = msg.mode;
+      if (msg.variant) gameVariant = msg.variant;
       if (msg.categories) CATEGORIES = msg.categories;
-      // Guest sees coin flip — no callback, start msg will arrive after host's delay
       showCoinFlipScreen(msg.winner, 'guest', null);
       break;
     case 'start':             guestReceiveStart(msg); break;
-    case 'picker_result':     guestReceivePickerResult(msg.names); break;
+    case 'picker_result':     gameVariant==='obo' ? guestReceivePickerResultObo(msg.names) : guestReceivePickerResult(msg.names); break;
     case 'picker_new_round':  guestPickerNewRound(); break;
-    case 'compare_locked':    hostReceiveCompareLocked(msg.assignments); break;
-    case 'compare_result':    guestReceiveCompareResult(msg.p1, msg.p2); break;
+    case 'picker_assignments': p1ReceivePickerAssignments(msg.assignments); break;
+    case 'compare_locked':    gameVariant==='obo' ? hostReceiveCompareLockedObo(msg.assignments) : hostReceiveCompareLocked(msg.assignments); break;
+    case 'compare_result':    gameVariant==='obo' ? guestReceiveCompareResultObo(msg.p1, msg.p2) : guestReceiveCompareResult(msg.p1, msg.p2); break;
     case 'compare_new':       compareGuestNewRound(msg.names); break;
-    case 'guesser_assigned':  p2ReceiveGuesserAssigned(msg); break;
-    case 'guesser_guesses':   p1ReceiveGuesserGuesses(msg.guesses); break;
-    case 'guesser_result':    p2ShowGuesserResult(msg.score, msg.resultRows); break;
-    case 'guesser_new':       p2GuesserNewRound(msg.names); break;
+    case 'guesser_assigned':  p1ReceiveGuesserAssigned(msg); break;
+    case 'guesser_guesses':   gameVariant==='obo' ? p2ReceiveGuesserGuessesObo(msg.guesses) : p2ReceiveGuesserGuesses(msg.guesses); break;
+    case 'guesser_result':    gameVariant==='obo' ? p1ShowGuesserResultObo(msg.score, msg.resultRows) : p1ShowGuesserResult(msg.score, msg.resultRows); break;
+    case 'guesser_new':       p1GuesserNewRound(msg.names); break;
     case 'request_new_round': if(myRole==='host') handleGuestRequestNew(); break;
   }
 }
@@ -1310,162 +1630,299 @@ function handleMessage(msg) {
 // hostPerspective: 'host_p1' | 'host_p2' | 'host' (symmetric)
 function launchGame(names, hostPerspective) {
   if (currentMode==='picker') {
-    if (hostPerspective==='host_p1') { pickerInit(); showScreen('screen-picker-host'); }
-    else {
-      // Host is viewer — show guest waiting screen
-      document.getElementById('picker-guest-waiting').textContent='Waiting for Player 2 to assign names…';
-      document.getElementById('picker-guest-waiting').style.display='';
-      document.getElementById('picker-guest-result').style.display='none';
-      document.getElementById('picker-guest-btns').style.display='none';
-      showScreen('screen-picker-guest');
+    if (hostPerspective==='host_p1') {
+      gameVariant==='obo' ? pickerOboInit() : pickerInit();
+      showScreen(gameVariant==='obo' ? 'screen-picker-obo-host' : 'screen-picker-host');
+    } else {
+      if (gameVariant==='obo') {
+        document.getElementById('picker-obo-guest-waiting').style.display='';
+        document.getElementById('picker-obo-guest-active').style.display='none';
+        document.getElementById('picker-obo-guest-result').style.display='none';
+        showScreen('screen-picker-obo-guest');
+      } else {
+        document.getElementById('picker-guest-waiting').textContent='Waiting for Player 2 to choose names…';
+        document.getElementById('picker-guest-waiting').style.display='';
+        document.getElementById('picker-guest-assign').style.display='none';
+        document.getElementById('picker-guest-result').style.display='none';
+        showScreen('screen-picker-guest');
+      }
     }
   } else if (currentMode==='compare') {
-    compareInit(names,'host'); showScreen('screen-compare');
+    gameVariant==='obo' ? compareOboInit(names,'host') : compareInit(names,'host');
+    showScreen(gameVariant==='obo' ? 'screen-compare-obo' : 'screen-compare');
   } else if (currentMode==='guesser') {
-    if (hostPerspective==='host_p1') { guesserP1Init(names); showScreen('screen-guesser-p1'); }
-    else {
-      // Host is guesser
-      guesserInitAsP2(names); showScreen('screen-guesser-p2');
+    if (hostPerspective==='host_p1') {
+      gameVariant==='obo' ? guesserOboP1WaitForP2() : guesserP1WaitForP2();
+      showScreen(gameVariant==='obo' ? 'screen-guesser-obo-p1' : 'screen-guesser-p1');
+    } else {
+      gameVariant==='obo' ? guesserOboP2Init(names) : guesserP2Init(names);
+      showScreen(gameVariant==='obo' ? 'screen-guesser-obo-p2' : 'screen-guesser-p2');
     }
   }
 }
 
 function guestReceiveStart(msg) {
   currentMode = msg.mode;
+  if (msg.variant) gameVariant = msg.variant;
   if (msg.categories) CATEGORIES = msg.categories;
   const guestIsP1 = (msg.p1 === 'guest');
 
   if (msg.mode==='picker') {
     if (guestIsP1) {
-      pickerInit();
-      showScreen('screen-picker-host');
+      gameVariant==='obo' ? pickerOboInit() : pickerInit();
+      showScreen(gameVariant==='obo' ? 'screen-picker-obo-host' : 'screen-picker-host');
     } else {
-      document.getElementById('picker-guest-waiting').textContent='Waiting for Player 1 to assign names…';
-      document.getElementById('picker-guest-waiting').style.display='';
-      document.getElementById('picker-guest-result').style.display='none';
-      document.getElementById('picker-guest-btns').style.display='none';
-      showScreen('screen-picker-guest');
+      if (gameVariant==='obo') {
+        document.getElementById('picker-obo-guest-waiting').style.display='';
+        document.getElementById('picker-obo-guest-active').style.display='none';
+        document.getElementById('picker-obo-guest-result').style.display='none';
+        showScreen('screen-picker-obo-guest');
+      } else {
+        document.getElementById('picker-guest-waiting').textContent='Waiting for Player 1 to choose names…';
+        document.getElementById('picker-guest-waiting').style.display='';
+        document.getElementById('picker-guest-assign').style.display='none';
+        document.getElementById('picker-guest-result').style.display='none';
+        showScreen('screen-picker-guest');
+      }
     }
   } else if (msg.mode==='compare') {
-    compareInit(msg.names,'guest'); showScreen('screen-compare');
+    gameVariant==='obo' ? compareOboInit(msg.names,'guest') : compareInit(msg.names,'guest');
+    showScreen(gameVariant==='obo' ? 'screen-compare-obo' : 'screen-compare');
   } else if (msg.mode==='guesser') {
     if (guestIsP1) {
-      guesserP1Init(msg.names || randomNames()); showScreen('screen-guesser-p1');
+      gameVariant==='obo' ? guesserOboP1WaitForP2() : guesserP1WaitForP2();
+      showScreen(gameVariant==='obo' ? 'screen-guesser-obo-p1' : 'screen-guesser-p1');
     } else {
-      showScreen('screen-guesser-p2');
-      document.getElementById('guesser-p2-waiting').style.display='';
-      document.getElementById('guesser-p2-guess-phase').style.display='none';
-      document.getElementById('guesser-p2-result-phase').style.display='none';
+      gameVariant==='obo' ? guesserOboP2Init(msg.names||randomNames()) : guesserP2Init(msg.names||randomNames());
+      showScreen(gameVariant==='obo' ? 'screen-guesser-obo-p2' : 'screen-guesser-p2');
     }
   }
 }
 
-function guesserInitAsP2(names) {
-  guesserNames = names;
-  const guessObj={};
-  CATEGORIES.forEach(c=>guessObj[c]=null);
-  document.getElementById('guesser-p2-waiting').style.display='none';
-  document.getElementById('guesser-p2-guess-phase').style.display='';
-  document.getElementById('guesser-p2-result-phase').style.display='none';
-  document.getElementById('guesser-p2-warn').textContent='';
-  buildNameCards('guesser-p2-cards', names, guessObj,
-    (name,cat,i)=>{ onAssignGeneric(name,cat,i,'guesser-p2-cards',guessObj,names); buildAssignTable('guesser-p2-assign-table',guessObj); window._p2GuessObj=guessObj; },
-    0, null);
-  window._p2GuessObj = guessObj;
-  buildAssignTable('guesser-p2-assign-table', guessObj);
+function p1ReceiveGuesserAssigned(msg) {
+  if (msg.names) guesserNames = msg.names;
+  gameVariant==='obo' ? guesserOboP1Init(guesserNames) : guesserP1Init(guesserNames);
+  if (gameVariant==='obo') showScreen('screen-guesser-obo-p1');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  PICKER MP
 // ─────────────────────────────────────────────────────────────────────────────
-let pickerChosen = []; // up to 3 names selected from full list
+// pickerSlots: array of 3 strings (or '' if empty)
+let pickerSlots = ['', '', ''];
+let pickerFocusedSlot = 0; // which slot a tile-tap will target
 
 function pickerInit() {
-  pickerChosen = [];
+  pickerSlots = ['', '', ''];
+  pickerFocusedSlot = 0;
   document.getElementById('picker-warn').textContent = '';
   document.getElementById('picker-warn').style.color = 'var(--warn)';
+  const inputs = ['picker-input-1','picker-input-2','picker-input-3'];
+  inputs.forEach(id => {
+    document.getElementById(id).value = '';
+    document.getElementById(id).disabled = false;
+    document.getElementById(id).classList.remove('filled');
+  });
+  ['picker-clear-1','picker-clear-2','picker-clear-3'].forEach(id =>
+    document.getElementById(id).classList.add('hidden'));
   renderPickerGrid();
+  updatePickerCount();
+  setTimeout(() => document.getElementById('picker-input-1').focus(), 80);
 }
 
 function renderPickerGrid() {
   const grid = document.getElementById('picker-name-grid');
+  if (!grid) return;
   grid.innerHTML = '';
   NAMES.forEach(name => {
+    const slotIdx = pickerSlots.indexOf(name);
+    const isChosen = slotIdx !== -1;
     const tile = document.createElement('div');
-    tile.className = 'picker-tile' + (pickerChosen.includes(name) ? ' chosen' : '');
+    tile.className = 'picker-tile' + (isChosen ? ' tile-chosen' : '');
     tile.textContent = name;
-    tile.onclick = () => togglePickerName(name);
+    if (!isChosen) {
+      tile.onclick = () => pickerTileClick(name);
+    } else {
+      tile.classList.add('tile-used');
+      tile.title = `Slot ${slotIdx + 1}`;
+    }
     grid.appendChild(tile);
   });
-  document.getElementById('picker-count-label').textContent = `${pickerChosen.length} / 3 chosen`;
 }
 
-function togglePickerName(name) {
-  if (pickerChosen.includes(name)) {
-    pickerChosen = pickerChosen.filter(n => n !== name);
-  } else {
-    if (pickerChosen.length >= 3) {
-      document.getElementById('picker-warn').textContent = 'You can only pick 3 names.';
-      return;
-    }
-    pickerChosen.push(name);
+function pickerTileClick(name) {
+  // Fill the focused slot, or the first empty slot
+  let target = pickerFocusedSlot;
+  if (pickerSlots[target] !== '') {
+    // focused slot is already filled; find first empty
+    target = pickerSlots.indexOf('');
+    if (target === -1) return; // all full
   }
-  document.getElementById('picker-warn').textContent = '';
+  pickerSlots[target] = name;
+  syncPickerInputs();
   renderPickerGrid();
+  updatePickerCount();
+  // Move focus to next empty slot
+  const next = pickerSlots.indexOf('');
+  if (next !== -1) {
+    pickerFocusedSlot = next;
+    document.getElementById(`picker-input-${next + 1}`).focus();
+  }
+}
+
+function pickerInputFocused(idx) {
+  pickerFocusedSlot = idx;
+}
+
+function pickerInputChanged(idx) {
+  const val = document.getElementById(`picker-input-${idx + 1}`).value;
+  pickerSlots[idx] = val; // live sync (free text)
+  syncPickerInputStyles();
+  renderPickerGrid();
+  updatePickerCount();
+}
+
+function pickerClearSlot(idx) {
+  pickerSlots[idx] = '';
+  document.getElementById(`picker-input-${idx + 1}`).value = '';
+  document.getElementById(`picker-input-${idx + 1}`).classList.remove('filled');
+  document.getElementById(`picker-clear-${idx + 1}`).classList.add('hidden');
+  renderPickerGrid();
+  updatePickerCount();
+  document.getElementById(`picker-input-${idx + 1}`).focus();
+}
+
+function syncPickerInputs() {
+  pickerSlots.forEach((val, i) => {
+    const input = document.getElementById(`picker-input-${i + 1}`);
+    input.value = val;
+  });
+  syncPickerInputStyles();
+}
+
+function syncPickerInputStyles() {
+  pickerSlots.forEach((val, i) => {
+    const input = document.getElementById(`picker-input-${i + 1}`);
+    const clearBtn = document.getElementById(`picker-clear-${i + 1}`);
+    if (val) {
+      input.classList.add('filled');
+      clearBtn.classList.remove('hidden');
+    } else {
+      input.classList.remove('filled');
+      clearBtn.classList.add('hidden');
+    }
+  });
+}
+
+function updatePickerCount() {
+  const filled = pickerSlots.filter(s => s.trim() !== '').length;
+  const label = document.getElementById('picker-count-label');
+  if (label) label.textContent = `${filled} / 3`;
 }
 
 function pickerClearAll() {
-  pickerChosen = [];
+  pickerSlots = ['', '', ''];
+  pickerFocusedSlot = 0;
+  syncPickerInputs();
   renderPickerGrid();
+  updatePickerCount();
+  document.getElementById('picker-warn').textContent = '';
+  document.getElementById('picker-input-1').focus();
 }
 
 function pickerConfirm() {
-  if (pickerChosen.length < 3) {
-    document.getElementById('picker-warn').textContent = `Pick ${3 - pickerChosen.length} more name${pickerChosen.length === 2 ? '' : 's'}.`;
+  const vals = pickerSlots.map(s => s.trim()).filter(s => s.length > 0);
+  if (vals.length < 3) {
+    document.getElementById('picker-warn').textContent = 'Fill in all 3 names.';
     return;
   }
-  send({ type: 'picker_result', names: pickerChosen });
+  if (new Set(vals.map(v => v.toLowerCase())).size < 3) {
+    document.getElementById('picker-warn').textContent = 'All 3 names must be different.';
+    return;
+  }
+  send({ type: 'picker_result', names: vals });
   document.getElementById('picker-warn').style.color = 'var(--success)';
-  document.getElementById('picker-warn').textContent = '✓ Sent to Player 2!';
-  // Disable all tiles so they can't change after sending
-  document.querySelectorAll('.picker-tile').forEach(t => t.style.pointerEvents = 'none');
-}
-
-function guestReceivePickerResult(names) {
-  document.getElementById('picker-guest-waiting').style.display = 'none';
-  document.getElementById('picker-guest-result').style.display = '';
-
-  const container = document.getElementById('picker-guest-names');
-  container.innerHTML = '';
-  // Stagger reveal of the 3 names
-  names.forEach((name, i) => {
-    setTimeout(() => {
-      const row = document.createElement('div');
-      row.className = 'reveal-name-row';
-      row.innerHTML = `<span class="reveal-num">${i + 1}</span><span class="reveal-name">${name}</span>`;
-      container.appendChild(row);
-      if (i === names.length - 1) {
-        document.getElementById('picker-guest-btns').style.display = '';
-      }
-    }, i * 600);
+  document.getElementById('picker-warn').textContent = '✓ Sent! Waiting for P2 to assign categories…';
+  ['picker-input-1','picker-input-2','picker-input-3'].forEach(id =>
+    document.getElementById(id).disabled = true);
+  document.querySelectorAll('.picker-tile').forEach(t => {
+    t.style.pointerEvents = 'none'; t.style.opacity = '.4';
   });
 }
 
-function guestPickerNewRound() {
-  document.getElementById('picker-guest-waiting').style.display = '';
-  document.getElementById('picker-guest-waiting').textContent = 'Waiting for Player 1 to choose names…';
+// ── P2: receives the 3 names, assigns them to categories ──
+let pickerGuestAssignments = {};
+
+function guestReceivePickerResult(names) {
+  pickerGuestAssignments = {};
+  CATEGORIES.forEach(c => pickerGuestAssignments[c] = null);
+
+  document.getElementById('picker-guest-waiting').style.display = 'none';
+  document.getElementById('picker-guest-assign').style.display = '';
   document.getElementById('picker-guest-result').style.display = 'none';
-  document.getElementById('picker-guest-btns').style.display = 'none';
-  document.getElementById('picker-guest-names').innerHTML = '';
+  document.getElementById('picker-guest-warn').textContent = '';
+
+  buildNameCards('picker-guest-cards', names, pickerGuestAssignments,
+    (name, cat, i) => {
+      onAssignGeneric(name, cat, i, 'picker-guest-cards', pickerGuestAssignments, names);
+      buildAssignTable('picker-guest-assign-table', pickerGuestAssignments);
+    },
+    0, null
+  );
+  buildAssignTable('picker-guest-assign-table', pickerGuestAssignments);
+}
+
+function pickerGuestConfirm() {
+  const unset = CATEGORIES.filter(c => !pickerGuestAssignments[c]);
+  if (unset.length) {
+    document.getElementById('picker-guest-warn').textContent = `Still missing: ${unset.join(', ')}`;
+    return;
+  }
+  // Send assignments back to P1 to see
+  send({ type: 'picker_assignments', assignments: pickerGuestAssignments });
+  // Show result to P2
+  document.getElementById('picker-guest-assign').style.display = 'none';
+  document.getElementById('picker-guest-result').style.display = '';
+  buildAssignTable('picker-guest-result-table', pickerGuestAssignments);
+}
+
+function guestPickerNewRound() {
+  if (gameVariant==='obo') {
+    document.getElementById('picker-obo-guest-waiting').style.display='';
+    document.getElementById('picker-obo-guest-waiting').textContent='Waiting for Player 1 to choose and order names…';
+    document.getElementById('picker-obo-guest-active').style.display='none';
+    document.getElementById('picker-obo-guest-result').style.display='none';
+  } else {
+    document.getElementById('picker-guest-waiting').style.display = '';
+    document.getElementById('picker-guest-waiting').textContent = 'Waiting for Player 1 to choose names…';
+    document.getElementById('picker-guest-assign').style.display = 'none';
+    document.getElementById('picker-guest-result').style.display = 'none';
+  }
 }
 
 function guestRequestNewRound() {
   send({ type: 'request_new_round' });
-  document.getElementById('picker-guest-waiting').style.display = '';
-  document.getElementById('picker-guest-waiting').textContent = 'Asking Player 1 for a new round…';
-  document.getElementById('picker-guest-result').style.display = 'none';
-  document.getElementById('picker-guest-btns').style.display = 'none';
-  document.getElementById('picker-guest-names').innerHTML = '';
+  guestPickerNewRound();
+  // reset whichever waiting message is shown
+  if (gameVariant==='obo') {
+    document.getElementById('picker-obo-guest-waiting').textContent='Asking Player 1 for a new round…';
+  } else {
+    document.getElementById('picker-guest-waiting').textContent='Asking Player 1 for a new round…';
+  }
+}
+
+function p1ReceivePickerAssignments(assignments) {
+  // P1 sees P2's category assignments as a result overlay
+  document.getElementById('picker-warn').style.color = 'var(--success)';
+  document.getElementById('picker-warn').textContent = '✓ P2 has assigned the categories!';
+  // Reuse the result overlay to show P1 what P2 decided
+  buildAssignTable('result-assign-table', assignments);
+  document.getElementById('result-play-again-btn').onclick = () => {
+    closeResult();
+    pickerInit();
+    send({ type: 'picker_new_round' });
+  };
+  document.getElementById('result-overlay').classList.add('open');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1536,132 +1993,198 @@ function compareNewRound() {
   if(myRole==='host'){ const n=randomNames(); send({type:'compare_new',names:n}); compareInit(n,'host'); }
   else { send({type:'request_new_round'}); }
 }
-function compareGuestNewRound(names) { compareInit(names,'guest'); }
+function compareGuestNewRound(names) {
+  if (gameVariant==='obo') { compareOboInit(names,'guest'); showScreen('screen-compare-obo'); }
+  else { compareInit(names,'guest'); }
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  GUESSER MP
+//  GUESSER MP  (P1 = guesser, P2 = assigner)
 // ─────────────────────────────────────────────────────────────────────────────
-function guesserP1Init(names) {
-  guesserNames=names; guesserP1Assignments={}; CATEGORIES.forEach(c=>guesserP1Assignments[c]=null); guesserP1SwapsLeft=1;
-  document.getElementById('guesser-p1-swap-label').textContent='SWAPS: 1/1';
-  document.getElementById('guesser-p1-swap-label').style.color='var(--cyan)';
-  document.getElementById('guesser-p1-warn').textContent='';
-  document.getElementById('guesser-p1-assign-phase').style.display='';
-  document.getElementById('guesser-p1-waiting').style.display='none';
-  document.getElementById('guesser-p1-result-phase').style.display='none';
-  buildNameCards('guesser-p1-cards',guesserNames,guesserP1Assignments,
-    (name,cat,i)=>{ onAssignGeneric(name,cat,i,'guesser-p1-cards',guesserP1Assignments,guesserNames); buildAssignTable('guesser-p1-assign-table',guesserP1Assignments); },
-    guesserP1SwapsLeft, i=>guesserP1Swap(i));
-  buildAssignTable('guesser-p1-assign-table',guesserP1Assignments);
+let guesserNames = [];
+let guesserP2Assignments = {};   // P2's secret assignments
+let guesserP2SwapsLeft = 1;
+let guesserP1GuessObj = {};      // P1's guesses
+
+// ── P2 (assigner) ────────────────────────────────────────────────────────────
+function guesserP2Init(names) {
+  guesserNames = names;
+  guesserP2Assignments = {};
+  CATEGORIES.forEach(c => guesserP2Assignments[c] = null);
+  guesserP2SwapsLeft = 1;
+
+  document.getElementById('guesser-p2-swap-label').textContent = 'SWAPS: 1/1';
+  document.getElementById('guesser-p2-swap-label').style.color = 'var(--cyan)';
+  document.getElementById('guesser-p2-warn').textContent = '';
+  document.getElementById('guesser-p2-assign-phase').style.display = '';
+  document.getElementById('guesser-p2-waiting').style.display = 'none';
+  document.getElementById('guesser-p2-result-phase').style.display = 'none';
+
+  buildNameCards('guesser-p2-cards', guesserNames, guesserP2Assignments,
+    (name, cat, i) => {
+      onAssignGeneric(name, cat, i, 'guesser-p2-cards', guesserP2Assignments, guesserNames);
+      buildAssignTable('guesser-p2-assign-table', guesserP2Assignments);
+    },
+    guesserP2SwapsLeft, i => guesserP2Swap(i));
+  buildAssignTable('guesser-p2-assign-table', guesserP2Assignments);
 }
-function guesserP1Swap(idx) {
-  if(guesserP1SwapsLeft<=0) return;
-  guesserP1SwapsLeft--;
-  document.getElementById('guesser-p1-swap-label').textContent='SWAPS: 0/1';
-  document.getElementById('guesser-p1-swap-label').style.color='var(--muted)';
-  for(const c of CATEGORIES) if(guesserP1Assignments[c]===guesserNames[idx]) guesserP1Assignments[c]=null;
-  guesserNames[idx]=randomNames(guesserNames)[0];
-  buildNameCards('guesser-p1-cards',guesserNames,guesserP1Assignments,
-    (name,cat,i)=>{ onAssignGeneric(name,cat,i,'guesser-p1-cards',guesserP1Assignments,guesserNames); buildAssignTable('guesser-p1-assign-table',guesserP1Assignments); },
-    guesserP1SwapsLeft, null);
-  buildAssignTable('guesser-p1-assign-table',guesserP1Assignments);
+
+function guesserP2Swap(idx) {
+  if (guesserP2SwapsLeft <= 0) return;
+  guesserP2SwapsLeft--;
+  document.getElementById('guesser-p2-swap-label').textContent = 'SWAPS: 0/1';
+  document.getElementById('guesser-p2-swap-label').style.color = 'var(--muted)';
+  for (const c of CATEGORIES) if (guesserP2Assignments[c] === guesserNames[idx]) guesserP2Assignments[c] = null;
+  guesserNames[idx] = randomNames(guesserNames)[0];
+  buildNameCards('guesser-p2-cards', guesserNames, guesserP2Assignments,
+    (name, cat, i) => {
+      onAssignGeneric(name, cat, i, 'guesser-p2-cards', guesserP2Assignments, guesserNames);
+      buildAssignTable('guesser-p2-assign-table', guesserP2Assignments);
+    },
+    guesserP2SwapsLeft, null);
+  buildAssignTable('guesser-p2-assign-table', guesserP2Assignments);
 }
-function guesserP1NewRound() {
-  const names=randomNames(); send({ type:'guesser_new', names }); guesserP1Init(names);
+
+function guesserP2NewRound() {
+  // P2 starts a new round — pick new names and tell P1
+  const names = randomNames();
+  send({ type: 'guesser_new', names });
+  guesserP2Init(names);
 }
-function guesserP1Confirm() {
-  const unset=CATEGORIES.filter(c=>!guesserP1Assignments[c]);
-  if(unset.length){ document.getElementById('guesser-p1-warn').textContent=`Still missing: ${unset.join(', ')}`; return; }
-  send({ type:'guesser_assigned', names:guesserNames, assignments:guesserP1Assignments });
-  document.getElementById('guesser-p1-assign-phase').style.display='none';
-  document.getElementById('guesser-p1-waiting').style.display='';
+
+function guesserP2Confirm() {
+  const unset = CATEGORIES.filter(c => !guesserP2Assignments[c]);
+  if (unset.length) {
+    document.getElementById('guesser-p2-warn').textContent = `Still missing: ${unset.join(', ')}`;
+    return;
+  }
+  // Send the names to P1 so they can guess (do NOT send assignments)
+  send({ type: 'guesser_assigned', names: guesserNames });
+  document.getElementById('guesser-p2-assign-phase').style.display = 'none';
+  document.getElementById('guesser-p2-waiting').style.display = '';
 }
-function p1ReceiveGuesserGuesses(guesses) {
-  document.getElementById('guesser-p1-waiting').style.display='none';
-  document.getElementById('guesser-p1-result-phase').style.display='';
-  let score=0;
-  const content=document.getElementById('guesser-p1-result-content'); content.innerHTML='';
+
+function p2ReceiveGuesserGuesses(guesses) {
+  // P2 gets P1's guesses, scores them, sends results back
+  document.getElementById('guesser-p2-waiting').style.display = 'none';
+  document.getElementById('guesser-p2-result-phase').style.display = '';
+
+  let score = 0;
+  const content = document.getElementById('guesser-p2-result-content');
+  content.innerHTML = '';
   const resultRows = [];
-  CATEGORIES.forEach(cat=>{
-    const correct=guesserP1Assignments[cat];
-    const guessed=Object.keys(guesses).find(n=>guesses[n]===cat);
-    const match=correct===guessed; if(match) score++;
-    resultRows.push({ cat, correct, guessed: guessed||null, match });
-    const row=document.createElement('div'); row.className='guess-result-card';
-    row.innerHTML=`<span class="${match?'tick':'cross'}" style="font-size:16px;">${match?'✓':'✗'}</span><span style="color:var(--cyan);min-width:90px;">${cat}:</span><span style="color:var(--muted);">You: <b style="color:var(--text)">${correct}</b></span><span style="color:var(--muted);">P2 guessed: <b style="color:${match?'var(--success)':'var(--warn)'}">${guessed||'?'}</b></span>`;
+
+  CATEGORIES.forEach(cat => {
+    const correct = guesserP2Assignments[cat];
+    const guessed = Object.keys(guesses).find(n => guesses[n] === cat);
+    const match = correct === guessed;
+    if (match) score++;
+    resultRows.push({ cat, correct, guessed: guessed || null, match });
+
+    const row = document.createElement('div');
+    row.className = 'guess-result-card';
+    row.innerHTML = `<span class="${match ? 'tick' : 'cross'}" style="font-size:16px;">${match ? '✓' : '✗'}</span><span style="color:var(--cyan);min-width:90px;">${cat}:</span><span style="color:var(--muted);">You picked: <b style="color:var(--text)">${correct}</b></span><span style="color:var(--muted);">P1 guessed: <b style="color:${match ? 'var(--success)' : 'var(--warn)'}">${guessed || '?'}</b></span>`;
     content.appendChild(row);
   });
-  const scoreEl=document.createElement('div'); scoreEl.className='score-big'; scoreEl.textContent=`${score}/3`;
+
+  const scoreEl = document.createElement('div');
+  scoreEl.className = 'score-big';
+  scoreEl.textContent = `${score}/3`;
   content.appendChild(scoreEl);
-  // Now send the scored results to P2 so they can see
-  send({ type:'guesser_result', score, resultRows });
-}
-function p2ReceiveGuesserAssigned(msg) {
-  if(msg.names) guesserNames=msg.names;
-  const guessObj={}; CATEGORIES.forEach(c=>guessObj[c]=null);
-  document.getElementById('guesser-p2-waiting').style.display='none';
-  document.getElementById('guesser-p2-guess-phase').style.display='';
-  document.getElementById('guesser-p2-result-phase').style.display='none';
-  document.getElementById('guesser-p2-warn').textContent='';
-  buildNameCards('guesser-p2-cards',guesserNames,guessObj,
-    (name,cat,i)=>{ onAssignGeneric(name,cat,i,'guesser-p2-cards',guessObj,guesserNames); buildAssignTable('guesser-p2-assign-table',guessObj); window._p2GuessObj=guessObj; },
-    0, null);
-  window._p2GuessObj=guessObj;
-  buildAssignTable('guesser-p2-assign-table',guessObj);
-}
-function guesserP2Confirm() {
-  const guessObj=window._p2GuessObj||{};
-  const unset=CATEGORIES.filter(c=>!guessObj[c]);
-  if(unset.length){ document.getElementById('guesser-p2-warn').textContent=`Still missing: ${unset.join(', ')}`; return; }
-  const nameMap={}; CATEGORIES.forEach(c=>{ if(guessObj[c]) nameMap[guessObj[c]]=c; });
-  send({ type:'guesser_guesses', guesses:nameMap });
-  // Lock the guess UI and show waiting state — don't reveal anything yet
-  document.getElementById('guesser-p2-guess-phase').style.display='none';
-  document.getElementById('guesser-p2-result-phase').style.display='';
-  document.getElementById('guesser-p2-submitted-msg').style.display='';
-  document.getElementById('guesser-p2-result-content').style.display='none';
-  document.getElementById('guesser-p2-result-btns').style.display='none';
+
+  // Send scored results to P1
+  send({ type: 'guesser_result', score, resultRows });
 }
 
-function p2ShowGuesserResult(score, resultRows) {
-  // Called when P1 sends back the scored results
-  document.getElementById('guesser-p2-submitted-msg').style.display='none';
-  const content = document.getElementById('guesser-p2-result-content');
-  content.style.display='';
-  content.innerHTML = '<div class="success-text">✦ YOUR SCORE ✦</div>';
+function guesserP2RequestNew() {
+  guesserP2NewRound();
+}
+
+// ── P1 (guesser) ─────────────────────────────────────────────────────────────
+function guesserP1Init(names) {
+  guesserNames = names;
+  guesserP1GuessObj = {};
+  CATEGORIES.forEach(c => guesserP1GuessObj[c] = null);
+
+  document.getElementById('guesser-p1-waiting').style.display = 'none';
+  document.getElementById('guesser-p1-guess-phase').style.display = '';
+  document.getElementById('guesser-p1-submitted').style.display = 'none';
+  document.getElementById('guesser-p1-result-phase').style.display = 'none';
+  document.getElementById('guesser-p1-warn').textContent = '';
+
+  buildNameCards('guesser-p1-cards', guesserNames, guesserP1GuessObj,
+    (name, cat, i) => {
+      onAssignGeneric(name, cat, i, 'guesser-p1-cards', guesserP1GuessObj, guesserNames);
+      buildAssignTable('guesser-p1-assign-table', guesserP1GuessObj);
+    },
+    0, null);
+  buildAssignTable('guesser-p1-assign-table', guesserP1GuessObj);
+}
+
+function guesserP1WaitForP2() {
+  // P1 waiting screen shown at game start, before P2 assigns
+  document.getElementById('guesser-p1-waiting').textContent = 'Waiting for Player 2 to assign names…';
+  document.getElementById('guesser-p1-waiting').style.display = '';
+  document.getElementById('guesser-p1-guess-phase').style.display = 'none';
+  document.getElementById('guesser-p1-submitted').style.display = 'none';
+  document.getElementById('guesser-p1-result-phase').style.display = 'none';
+}
+
+function guesserP1SubmitGuess() {
+  const unset = CATEGORIES.filter(c => !guesserP1GuessObj[c]);
+  if (unset.length) {
+    document.getElementById('guesser-p1-warn').textContent = `Still missing: ${unset.join(', ')}`;
+    return;
+  }
+  // Convert to name→category map and send
+  const nameMap = {};
+  CATEGORIES.forEach(c => { if (guesserP1GuessObj[c]) nameMap[guesserP1GuessObj[c]] = c; });
+  send({ type: 'guesser_guesses', guesses: nameMap });
+
+  document.getElementById('guesser-p1-guess-phase').style.display = 'none';
+  document.getElementById('guesser-p1-submitted').style.display = '';
+}
+
+function p1ShowGuesserResult(score, resultRows) {
+  // Called when P2 sends back scored results
+  document.getElementById('guesser-p1-submitted').style.display = 'none';
+  document.getElementById('guesser-p1-result-phase').style.display = '';
+
+  const content = document.getElementById('guesser-p1-result-content');
+  content.innerHTML = '';
+
   resultRows.forEach(r => {
     const row = document.createElement('div');
     row.className = 'guess-result-card';
-    row.innerHTML = `<span class="${r.match?'tick':'cross'}" style="font-size:16px;">${r.match?'✓':'✗'}</span><span style="color:var(--cyan);min-width:90px;">${r.cat}:</span><span style="color:var(--muted);">P1 picked: <b style="color:var(--text)">${r.correct}</b></span><span style="color:var(--muted);">You guessed: <b style="color:${r.match?'var(--success)':'var(--warn)'}">${r.guessed||'?'}</b></span>`;
+    row.innerHTML = `<span class="${r.match ? 'tick' : 'cross'}" style="font-size:16px;">${r.match ? '✓' : '✗'}</span><span style="color:var(--cyan);min-width:90px;">${r.cat}:</span><span style="color:var(--muted);">P2 picked: <b style="color:var(--text)">${r.correct}</b></span><span style="color:var(--muted);">You guessed: <b style="color:${r.match ? 'var(--success)' : 'var(--warn)'}">${r.guessed || '?'}</b></span>`;
     content.appendChild(row);
   });
-  const scoreEl=document.createElement('div'); scoreEl.className='score-big'; scoreEl.textContent=`${score}/3`;
+
+  const scoreEl = document.createElement('div');
+  scoreEl.className = 'score-big';
+  scoreEl.textContent = `${score}/3`;
   content.appendChild(scoreEl);
-  document.getElementById('guesser-p2-result-btns').style.display='';
 }
-function guesserP2RequestNew() {
-  send({ type:'request_new_round' });
-  document.getElementById('guesser-p2-result-phase').style.display='none';
-  document.getElementById('guesser-p2-result-content').style.display='none';
-  document.getElementById('guesser-p2-result-btns').style.display='none';
-  document.getElementById('guesser-p2-submitted-msg').style.display='';
-  document.getElementById('guesser-p2-waiting').textContent='Asking Player 1 for a new round…';
-  document.getElementById('guesser-p2-waiting').style.display='';
+
+function guesserP1RequestNew() {
+  send({ type: 'request_new_round' });
+  guesserP1WaitForP2();
+  document.getElementById('guesser-p1-waiting').textContent = 'Asking Player 2 for a new round…';
 }
-function p2GuesserNewRound(names) {
-  document.getElementById('guesser-p2-result-phase').style.display='none';
-  document.getElementById('guesser-p2-result-content').style.display='none';
-  document.getElementById('guesser-p2-result-btns').style.display='none';
-  document.getElementById('guesser-p2-submitted-msg').style.display='';
-  p2ReceiveGuesserAssigned({ names });
+
+function p1GuesserNewRound(names) {
+  // P2 started a new round, P1 gets the new names to guess
+  guesserP1Init(names);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  HOST — handle guest's "new round" request
 // ─────────────────────────────────────────────────────────────────────────────
 function handleGuestRequestNew() {
-  // Return host to menu so they can pick the next game/start a new round with coin flip
-  returnToMenu();
+  if (currentMode === 'picker') { gameVariant==='obo' ? pickerOboInit() : pickerInit(); }
+  else if (currentMode === 'compare') { const n=randomNames(); send({type:'compare_new',names:n}); gameVariant==='obo' ? compareOboInit(n,'host') : compareInit(n,'host'); }
+  else if (currentMode === 'guesser') guesserP2NewRound();
+  else returnToMenu();
 }
 
 // Multiplayer menu button — host keeps connection, guest waits
@@ -1673,6 +2196,296 @@ function mpMenu() {
     document.getElementById('guest-waiting-msg').style.color='';
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  PICKER OBO
+// ─────────────────────────────────────────────────────────────────────────────
+let pickerOboSlots = ['','',''];
+let pickerOboFocused = 0;
+let pickerOboDragSrc = null;
+
+function pickerOboInit() {
+  pickerOboSlots = ['','',''];
+  pickerOboFocused = 0;
+  document.getElementById('picker-obo-warn').textContent = '';
+  renderPickerOboGrid();
+  renderPickerOboSlots();
+  initPickerOboDrag();
+}
+
+function renderPickerOboGrid() {
+  const grid = document.getElementById('picker-obo-name-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  NAMES.forEach(name => {
+    const chosen = pickerOboSlots.includes(name);
+    const tile = document.createElement('div');
+    tile.className = 'picker-tile' + (chosen ? ' tile-chosen tile-used' : '');
+    tile.textContent = name;
+    if (!chosen) tile.onclick = () => pickerOboTileClick(name);
+    grid.appendChild(tile);
+  });
+}
+
+function pickerOboTileClick(name) {
+  let target = pickerOboFocused;
+  if (pickerOboSlots[target] !== '') target = pickerOboSlots.indexOf('');
+  if (target === -1) return;
+  pickerOboSlots[target] = name;
+  const next = pickerOboSlots.indexOf('');
+  if (next !== -1) pickerOboFocused = next;
+  renderPickerOboGrid();
+  renderPickerOboSlots();
+}
+
+function renderPickerOboSlots() {
+  [0,1,2].forEach(i => {
+    document.getElementById(`picker-obo-slot-${i}`).textContent = pickerOboSlots[i] || '—';
+  });
+}
+
+function initPickerOboDrag() {
+  const items = document.querySelectorAll('#picker-obo-drag-list .drag-item');
+  items.forEach(item => {
+    item.addEventListener('dragstart', () => { pickerOboDragSrc = parseInt(item.dataset.idx); item.classList.add('dragging'); });
+    item.addEventListener('dragend', () => item.classList.remove('dragging'));
+    item.addEventListener('dragover', e => { e.preventDefault(); item.classList.add('drag-over'); });
+    item.addEventListener('dragleave', () => item.classList.remove('drag-over'));
+    item.addEventListener('drop', e => {
+      e.preventDefault(); item.classList.remove('drag-over');
+      const dest = parseInt(item.dataset.idx);
+      if (pickerOboDragSrc === null || pickerOboDragSrc === dest) return;
+      const tmp = pickerOboSlots[pickerOboDragSrc];
+      pickerOboSlots[pickerOboDragSrc] = pickerOboSlots[dest];
+      pickerOboSlots[dest] = tmp;
+      renderPickerOboSlots(); renderPickerOboGrid(); pickerOboDragSrc = null;
+    });
+  });
+}
+
+function pickerOboClearAll() {
+  pickerOboSlots = ['','','']; pickerOboFocused = 0;
+  renderPickerOboGrid(); renderPickerOboSlots();
+}
+
+function pickerOboConfirm() {
+  const vals = pickerOboSlots.map(s=>s.trim()).filter(s=>s);
+  if (vals.length < 3) { document.getElementById('picker-obo-warn').textContent='Fill all 3 slots.'; return; }
+  if (new Set(vals.map(v=>v.toLowerCase())).size<3) { document.getElementById('picker-obo-warn').textContent='All 3 names must be different.'; return; }
+  send({ type:'picker_result', names:vals });
+  document.getElementById('picker-obo-warn').style.color='var(--success)';
+  document.getElementById('picker-obo-warn').textContent='✓ Sent! P2 will assign in this order.';
+  document.querySelectorAll('#picker-obo-drag-list .drag-item').forEach(i=>i.setAttribute('draggable','false'));
+  document.querySelectorAll('#picker-obo-name-grid .picker-tile').forEach(t=>{t.style.pointerEvents='none';t.style.opacity='.4';});
+}
+
+// OBO dots helper
+function renderOboDots(containerId, total, done) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = '';
+  for (let i=0;i<total;i++) {
+    const dot = document.createElement('div');
+    dot.className = 'obo-order-dot' + (i<done?' done':i===done?' active':'');
+    dot.textContent = i+1;
+    el.appendChild(dot);
+  }
+}
+
+// P2 OBO: receives ordered names, assigns one at a time
+let pickerOboGuestQueue=[], pickerOboGuestDone=[], pickerOboGuestAssignments={}, pickerOboGuestNames=[];
+
+function guestReceivePickerResultObo(names) {
+  pickerOboGuestQueue=[...names]; pickerOboGuestNames=[...names]; pickerOboGuestDone=[]; pickerOboGuestAssignments={};
+  CATEGORIES.forEach(c=>pickerOboGuestAssignments[c]=null);
+  document.getElementById('picker-obo-guest-waiting').style.display='none';
+  document.getElementById('picker-obo-guest-active').style.display='';
+  document.getElementById('picker-obo-guest-result').style.display='none';
+  renderOboDots('picker-obo-dots', names.length, 0);
+  buildAssignTable('picker-obo-assign-table', pickerOboGuestAssignments);
+  pickerOboGuestNext();
+}
+function pickerOboGuestNext() {
+  if (!pickerOboGuestQueue.length) {
+    send({ type:'picker_assignments', assignments:pickerOboGuestAssignments });
+    document.getElementById('picker-obo-guest-active').style.display='none';
+    document.getElementById('picker-obo-guest-result').style.display='';
+    buildAssignTable('picker-obo-result-table', pickerOboGuestAssignments);
+    return;
+  }
+  const name = pickerOboGuestQueue.shift();
+  renderOboDots('picker-obo-dots', pickerOboGuestNames.length, pickerOboGuestDone.length);
+  document.getElementById('picker-obo-current-name').textContent = name;
+  const usedCats = CATEGORIES.filter(c=>pickerOboGuestAssignments[c]);
+  buildCatButtons('picker-obo-cat-btns', usedCats, cat => {
+    pickerOboGuestAssignments[cat]=name; pickerOboGuestDone.push(name);
+    buildAssignTable('picker-obo-assign-table', pickerOboGuestAssignments);
+    pickerOboGuestNext();
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  GUESSER OBO
+// ─────────────────────────────────────────────────────────────────────────────
+let gOboNames=[], gOboP2Assign={}, gOboP2SwapsLeft=1, gOboP2Queue=[], gOboP2Done=[];
+let gOboP1Queue=[], gOboP1Done=[], gOboP1Guesses={};
+
+function guesserOboP2Init(names) {
+  gOboNames=[...names]; gOboP2Queue=[...names]; gOboP2Done=[]; gOboP2Assign={}; CATEGORIES.forEach(c=>gOboP2Assign[c]=null); gOboP2SwapsLeft=1;
+  document.getElementById('guesser-obo-p2-swap-label').textContent='SWAPS: 1/1';
+  document.getElementById('guesser-obo-p2-swap-label').style.color='var(--cyan)';
+  document.getElementById('guesser-obo-p2-active').style.display='';
+  document.getElementById('guesser-obo-p2-waiting').style.display='none';
+  document.getElementById('guesser-obo-p2-result').style.display='none';
+  renderOboDots('guesser-obo-p2-dots', names.length, 0);
+  buildAssignTable('guesser-obo-p2-table', gOboP2Assign);
+  gOboP2Next();
+}
+function gOboP2Next() {
+  if (!gOboP2Queue.length) {
+    send({ type:'guesser_assigned', names:gOboNames });
+    document.getElementById('guesser-obo-p2-active').style.display='none';
+    document.getElementById('guesser-obo-p2-waiting').style.display='';
+    return;
+  }
+  const name=gOboP2Queue[0];
+  renderOboDots('guesser-obo-p2-dots', gOboNames.length, gOboP2Done.length);
+  document.getElementById('guesser-obo-p2-name').textContent=name;
+  document.getElementById('guesser-obo-p2-swap-x').classList.toggle('hidden', gOboP2SwapsLeft<=0);
+  const usedCats=CATEGORIES.filter(c=>gOboP2Assign[c]);
+  buildCatButtons('guesser-obo-p2-cat-btns', usedCats, cat=>{
+    gOboP2Queue.shift(); gOboP2Assign[cat]=name; gOboP2Done.push(name);
+    buildAssignTable('guesser-obo-p2-table', gOboP2Assign); gOboP2Next();
+  });
+}
+function guesserOboP2Swap() {
+  if (gOboP2SwapsLeft<=0) return;
+  const all=gOboP2Queue.concat(gOboP2Done), avail=NAMES.filter(n=>!all.includes(n));
+  if (!avail.length) return;
+  gOboP2SwapsLeft--;
+  document.getElementById('guesser-obo-p2-swap-label').textContent='SWAPS: 0/1';
+  document.getElementById('guesser-obo-p2-swap-label').style.color='var(--muted)';
+  const newName=avail[Math.floor(Math.random()*avail.length)];
+  gOboNames[gOboP2Done.length]=newName; gOboP2Queue[0]=newName;
+  document.getElementById('guesser-obo-p2-name').textContent=newName;
+  document.getElementById('guesser-obo-p2-swap-x').classList.add('hidden');
+}
+function p2ReceiveGuesserGuessesObo(guesses) {
+  document.getElementById('guesser-obo-p2-waiting').style.display='none';
+  document.getElementById('guesser-obo-p2-result').style.display='';
+  let score=0; const content=document.getElementById('guesser-obo-p2-result-content'); content.innerHTML=''; const resultRows=[];
+  CATEGORIES.forEach(cat=>{
+    const correct=gOboP2Assign[cat], guessed=Object.keys(guesses).find(n=>guesses[n]===cat), match=correct===guessed;
+    if(match) score++;
+    resultRows.push({cat,correct,guessed:guessed||null,match});
+    const row=document.createElement('div'); row.className='guess-result-card';
+    row.innerHTML=`<span class="${match?'tick':'cross'}" style="font-size:16px;">${match?'✓':'✗'}</span><span style="color:var(--cyan);min-width:90px;">${cat}:</span><span style="color:var(--muted);">You picked: <b style="color:var(--text)">${correct}</b></span><span style="color:var(--muted);">P1 guessed: <b style="color:${match?'var(--success)':'var(--warn)'}">${guessed||'?'}</b></span>`;
+    content.appendChild(row);
+  });
+  const scoreEl=document.createElement('div'); scoreEl.className='score-big'; scoreEl.textContent=`${score}/3`; content.appendChild(scoreEl);
+  send({ type:'guesser_result', score, resultRows });
+}
+function guesserOboP1WaitForP2() {
+  document.getElementById('guesser-obo-p1-waiting').textContent='Waiting for Player 2 to assign names…';
+  document.getElementById('guesser-obo-p1-waiting').style.display='';
+  document.getElementById('guesser-obo-p1-active').style.display='none';
+  document.getElementById('guesser-obo-p1-submitted').style.display='none';
+  document.getElementById('guesser-obo-p1-result').style.display='none';
+}
+function guesserOboP1Init(names) {
+  gOboNames=[...names]; gOboP1Guesses={}; CATEGORIES.forEach(c=>gOboP1Guesses[c]=null);
+  document.getElementById('guesser-obo-p1-waiting').style.display='none';
+  document.getElementById('guesser-obo-p1-active').style.display='';
+  document.getElementById('guesser-obo-p1-submitted').style.display='none';
+  document.getElementById('guesser-obo-p1-result').style.display='none';
+  document.getElementById('guesser-obo-p1-warn').textContent='';
+
+  // Build numbered name cards — all visible at once, ordered
+  buildNameCardsNumbered('guesser-obo-p1-cards', names, gOboP1Guesses,
+    (name, cat, i) => {
+      onAssignGeneric(name, cat, i, 'guesser-obo-p1-cards', gOboP1Guesses, names);
+      buildAssignTable('guesser-obo-p1-table', gOboP1Guesses);
+    }
+  );
+  buildAssignTable('guesser-obo-p1-table', gOboP1Guesses);
+}
+
+function gOboP1Submit() {
+  const unset = CATEGORIES.filter(c => !gOboP1Guesses[c]);
+  if (unset.length) {
+    document.getElementById('guesser-obo-p1-warn').textContent = `Still missing: ${unset.join(', ')}`;
+    return;
+  }
+  const nameMap={};
+  CATEGORIES.forEach(c=>{ if(gOboP1Guesses[c]) nameMap[gOboP1Guesses[c]]=c; });
+  send({ type:'guesser_guesses', guesses:nameMap });
+  document.getElementById('guesser-obo-p1-active').style.display='none';
+  document.getElementById('guesser-obo-p1-submitted').style.display='';
+}
+function p1ShowGuesserResultObo(score, resultRows) {
+  document.getElementById('guesser-obo-p1-submitted').style.display='none';
+  document.getElementById('guesser-obo-p1-result').style.display='';
+  const content=document.getElementById('guesser-obo-p1-result-content'); content.innerHTML='';
+  resultRows.forEach(r=>{
+    const row=document.createElement('div'); row.className='guess-result-card';
+    row.innerHTML=`<span class="${r.match?'tick':'cross'}" style="font-size:16px;">${r.match?'✓':'✗'}</span><span style="color:var(--cyan);min-width:90px;">${r.cat}:</span><span style="color:var(--muted);">P2 picked: <b style="color:var(--text)">${r.correct}</b></span><span style="color:var(--muted);">You guessed: <b style="color:${r.match?'var(--success)':'var(--warn)'}">${r.guessed||'?'}</b></span>`;
+    content.appendChild(row);
+  });
+  const scoreEl=document.createElement('div'); scoreEl.className='score-big'; scoreEl.textContent=`${score}/3`; content.appendChild(scoreEl);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  COMPARE OBO
+// ─────────────────────────────────────────────────────────────────────────────
+let cOboNames=[], cOboMyAssign={}, cOboTheirAssign={}, cOboQueue=[], cOboMyLocked=false, cOboTheirLocked=false;
+function compareOboInit(names, role) {
+  cOboNames=[...names]; cOboQueue=[...names]; cOboMyAssign={}; cOboTheirAssign={}; CATEGORIES.forEach(c=>cOboMyAssign[c]=null); cOboMyLocked=false; cOboTheirLocked=false;
+  document.getElementById('compare-obo-role-label').textContent=role==='host'?'YOU ARE P1':'YOU ARE P2';
+  document.getElementById('compare-obo-active').style.display='';
+  document.getElementById('compare-obo-waiting').style.display='none';
+  document.getElementById('compare-obo-results').style.display='none';
+  renderOboDots('compare-obo-dots', names.length, 0);
+  buildAssignTable('compare-obo-table', cOboMyAssign);
+  cOboNext();
+}
+function cOboNext() {
+  if (!cOboQueue.length) {
+    cOboMyLocked=true;
+    document.getElementById('compare-obo-active').style.display='none';
+    document.getElementById('compare-obo-waiting').style.display='';
+    if(myRole==='guest') send({ type:'compare_locked', assignments:cOboMyAssign });
+    if(myRole==='host' && cOboTheirLocked) showCOboResults();
+    return;
+  }
+  const name=cOboQueue.shift();
+  renderOboDots('compare-obo-dots', cOboNames.length, cOboNames.length-cOboQueue.length-1);
+  document.getElementById('compare-obo-name').textContent=name;
+  const usedCats=CATEGORIES.filter(c=>cOboMyAssign[c]);
+  buildCatButtons('compare-obo-cat-btns', usedCats, cat=>{
+    cOboMyAssign[cat]=name; buildAssignTable('compare-obo-table', cOboMyAssign); cOboNext();
+  });
+}
+function hostReceiveCompareLockedObo(theirAssign) {
+  cOboTheirAssign=theirAssign; cOboTheirLocked=true;
+  if(cOboMyLocked) showCOboResults();
+}
+function showCOboResults() {
+  document.getElementById('compare-obo-waiting').style.display='none';
+  document.getElementById('compare-obo-results').style.display='';
+  const grid=document.getElementById('compare-obo-results-grid'); grid.innerHTML='';
+  let matches=0;
+  const labels=myRole==='host'?['YOUR PICKS',"P2's PICKS"]:['YOUR PICKS',"P1's PICKS"];
+  [cOboMyAssign,cOboTheirAssign].forEach((a,ci)=>{
+    const col=document.createElement('div'); col.className='compare-col';
+    col.innerHTML=`<div class="compare-col-title">${labels[ci]}</div>`;
+    CATEGORIES.forEach(cat=>{ const item=document.createElement('div'); item.className='compare-item'; item.innerHTML=`<div class="ci-cat">${cat}</div><div class="ci-name">${a[cat]||'—'}</div>`; col.appendChild(item); });
+    grid.appendChild(col);
+  });
+  CATEGORIES.forEach(cat=>{ if(cOboMyAssign[cat]&&cOboMyAssign[cat]===cOboTheirAssign[cat]) matches++; });
+  document.getElementById('compare-obo-match-score').textContent=`${matches}/3`;
+  if(myRole==='host') send({ type:'compare_result', p1:cOboMyAssign, p2:cOboTheirAssign });
+}
+function guestReceiveCompareResultObo(p1,p2) { cOboMyAssign=p2; cOboTheirAssign=p1; showCOboResults(); }
 </script>
 </body>
 </html>

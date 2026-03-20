@@ -825,7 +825,7 @@
 </div>
 
 <!-- ═══════════════════════════════════════════
-     SCREEN: GUESSER OBO — P1 guesses one by one
+     SCREEN: GUESSER OBO — P1 guesses first (all at once, ordered)
 ═══════════════════════════════════════════ -->
 <div class="screen" id="screen-guesser-obo-p1">
   <div class="top-bar">
@@ -833,25 +833,23 @@
   </div>
   <div class="title" style="font-size:16px; letter-spacing:2px;">GUESSER — YOU ARE P1</div>
 
-  <div id="guesser-obo-p1-waiting" class="waiting-msg pulse">Waiting for Player 2 to assign names…</div>
-
-  <div id="guesser-obo-p1-active" style="display:none;">
-    <div class="subtitle mt8">All 3 names shown in P2's order. Guess each category.</div>
+  <div id="guesser-obo-p1-active">
+    <div class="subtitle mt8">Guess before P2 assigns. All 3 names shown in order.</div>
     <div class="name-cards-row" id="guesser-obo-p1-cards"></div>
     <div class="divider"></div>
     <div class="assign-table" id="guesser-obo-p1-table"></div>
     <div class="warn-text" id="guesser-obo-p1-warn"></div>
     <div class="btn-row">
-      <button class="btn btn-accent" onclick="gOboP1Submit()">✓ SUBMIT GUESSES</button>
+      <button class="btn btn-accent" onclick="gOboP1Submit()">✓ LOCK IN GUESSES</button>
     </div>
   </div>
 
   <div id="guesser-obo-p1-submitted" style="display:none;" class="waiting-msg pulse">
-    All guesses submitted! Waiting for P2 to reveal…
+    Guesses locked! Waiting for P2 to assign…
   </div>
 
   <div id="guesser-obo-p1-result" style="display:none;">
-    <div class="success-text">✦ YOUR SCORE ✦</div>
+    <div class="success-text">✦ RESULTS ✦</div>
     <div id="guesser-obo-p1-result-content"></div>
     <div class="btn-row">
       <button class="btn" onclick="guesserP1RequestNew()">↺ NEW ROUND</button>
@@ -866,27 +864,26 @@
 <div class="screen" id="screen-guesser-obo-p2">
   <div class="top-bar">
     <button class="back-btn" onclick="mpMenu()">← MENU</button>
-    <span id="guesser-obo-p2-swap-label" style="font-size:12px; color:var(--cyan);">SWAPS: 1/1</span>
   </div>
   <div class="title" style="font-size:16px; letter-spacing:2px;">GUESSER — YOU ARE P2</div>
   <div class="subtitle mt8">Assign names one at a time. P1 will guess!</div>
 
-  <div id="guesser-obo-p2-active">
+  <div id="guesser-obo-p2-waiting" class="waiting-msg pulse">Waiting for Player 1 to lock in guesses…</div>
+
+  <div id="guesser-obo-p2-active" style="display:none;">
+    <div class="subtitle mt8" style="margin-bottom:12px;">P1 has guessed. Now assign the real categories!</div>
     <div class="obo-reveal-box">
       <div class="obo-order-strip" id="guesser-obo-p2-dots"></div>
       <div class="current-name-label">ASSIGN THIS NAME</div>
       <div class="current-name-big" id="guesser-obo-p2-name">—</div>
-      <span id="guesser-obo-p2-swap-x" class="swap-x" style="position:absolute;top:10px;right:14px;" onclick="guesserOboP2Swap()">✕</span>
     </div>
     <div class="cat-btns" id="guesser-obo-p2-cat-btns"></div>
     <div class="divider"></div>
     <div class="assign-table" id="guesser-obo-p2-table"></div>
   </div>
 
-  <div id="guesser-obo-p2-waiting" style="display:none;" class="waiting-msg pulse">P1 is guessing… stand by!</div>
-
   <div id="guesser-obo-p2-result" style="display:none;">
-    <div class="success-text">✦ P1's GUESSES ✦</div>
+    <div class="success-text">✦ RESULTS ✦</div>
     <div id="guesser-obo-p2-result-content"></div>
     <div class="btn-row">
       <button class="btn" onclick="guesserP2RequestNew()">↺ NEW ROUND</button>
@@ -971,39 +968,34 @@
 </div>
 
 <!-- ═══════════════════════════════════════════
-     SCREEN: GUESSER P1 (the guesser)
+     SCREEN: GUESSER P1 (the guesser — goes first)
 ═══════════════════════════════════════════ -->
 <div class="screen" id="screen-guesser-p1">
   <div class="top-bar">
     <button class="back-btn" onclick="mpMenu()">← MENU</button>
   </div>
   <div class="title" style="font-size:16px; letter-spacing:2px;">GUESSER — YOU ARE P1</div>
-  <div class="subtitle mt8">Guess what categories P2 assigned to each name!</div>
+  <div class="subtitle mt8">Guess what categories P2 will assign. They haven't chosen yet!</div>
 
-  <!-- waiting for P2 to assign -->
-  <div id="guesser-p1-waiting" class="waiting-msg pulse">
-    Waiting for Player 2 to assign names…
-  </div>
-
-  <!-- guess phase -->
-  <div id="guesser-p1-guess-phase" style="display:none;">
+  <!-- guess phase (shown immediately) -->
+  <div id="guesser-p1-guess-phase">
     <div class="name-cards-row" id="guesser-p1-cards"></div>
     <div class="divider"></div>
     <div class="assign-table" id="guesser-p1-assign-table"></div>
     <div class="warn-text" id="guesser-p1-warn"></div>
     <div class="btn-row">
-      <button class="btn btn-accent" onclick="guesserP1SubmitGuess()">✓ SUBMIT GUESSES</button>
+      <button class="btn btn-accent" onclick="guesserP1SubmitGuess()">✓ LOCK IN GUESSES</button>
     </div>
   </div>
 
-  <!-- submitted, waiting for result -->
+  <!-- submitted, waiting for P2 to assign -->
   <div id="guesser-p1-submitted" style="display:none;" class="waiting-msg pulse">
-    Guesses submitted! Waiting for P2 to reveal…
+    Guesses locked! Waiting for P2 to assign…
   </div>
 
   <!-- result phase -->
   <div id="guesser-p1-result-phase" style="display:none;">
-    <div class="success-text">✦ YOUR SCORE ✦</div>
+    <div class="success-text">✦ RESULTS ✦</div>
     <div id="guesser-p1-result-content"></div>
     <div class="btn-row">
       <button class="btn" onclick="guesserP1RequestNew()">↺ NEW ROUND</button>
@@ -1013,36 +1005,34 @@
 </div>
 
 <!-- ═══════════════════════════════════════════
-     SCREEN: GUESSER P2 (the assigner)
+     SCREEN: GUESSER P2 (the assigner — goes second)
 ═══════════════════════════════════════════ -->
 <div class="screen" id="screen-guesser-p2">
   <div class="top-bar">
     <button class="back-btn" onclick="mpMenu()">← MENU</button>
-    <span id="guesser-p2-swap-label" style="font-size:12px; color:var(--cyan);">SWAPS: 1/1</span>
   </div>
   <div class="title" style="font-size:16px; letter-spacing:2px;">GUESSER — YOU ARE P2</div>
-  <div class="subtitle mt8">Assign names secretly. P1 will try to guess your choices!</div>
+  <div class="subtitle mt8">P1 has already guessed. Now assign the real categories!</div>
 
-  <!-- assign phase -->
-  <div id="guesser-p2-assign-phase">
+  <!-- waiting for P1 to guess -->
+  <div id="guesser-p2-waiting" class="waiting-msg pulse">
+    Waiting for Player 1 to lock in their guesses…
+  </div>
+
+  <!-- assign phase (shown after P1 locks in) -->
+  <div id="guesser-p2-assign-phase" style="display:none;">
     <div class="name-cards-row" id="guesser-p2-cards"></div>
     <div class="divider"></div>
     <div class="assign-table" id="guesser-p2-assign-table"></div>
     <div class="warn-text" id="guesser-p2-warn"></div>
     <div class="btn-row">
-      <button class="btn" onclick="guesserP2NewRound()">↺ NEW ROUND</button>
-      <button class="btn btn-accent" onclick="guesserP2Confirm()">✓ CONFIRM</button>
+      <button class="btn btn-accent" onclick="guesserP2Confirm()">✓ REVEAL</button>
     </div>
-  </div>
-
-  <!-- waiting for P1 to guess -->
-  <div id="guesser-p2-waiting" style="display:none;" class="waiting-msg pulse">
-    P1 is guessing… stand by!
   </div>
 
   <!-- result phase -->
   <div id="guesser-p2-result-phase" style="display:none;">
-    <div class="success-text">✦ P1's GUESSES ✦</div>
+    <div class="success-text">✦ RESULTS ✦</div>
     <div id="guesser-p2-result-content"></div>
     <div class="btn-row">
       <button class="btn" onclick="guesserP2RequestNew()">↺ NEW ROUND</button>
@@ -1652,9 +1642,11 @@ function launchGame(names, hostPerspective) {
     showScreen(gameVariant==='obo' ? 'screen-compare-obo' : 'screen-compare');
   } else if (currentMode==='guesser') {
     if (hostPerspective==='host_p1') {
-      gameVariant==='obo' ? guesserOboP1WaitForP2() : guesserP1WaitForP2();
+      // Host is P1 = guesser — gets names immediately and guesses
+      gameVariant==='obo' ? guesserOboP1Init(names) : guesserP1Init(names);
       showScreen(gameVariant==='obo' ? 'screen-guesser-obo-p1' : 'screen-guesser-p1');
     } else {
+      // Host is P2 = assigner — waits for P1 to lock in guesses
       gameVariant==='obo' ? guesserOboP2Init(names) : guesserP2Init(names);
       showScreen(gameVariant==='obo' ? 'screen-guesser-obo-p2' : 'screen-guesser-p2');
     }
@@ -1690,20 +1682,20 @@ function guestReceiveStart(msg) {
     showScreen(gameVariant==='obo' ? 'screen-compare-obo' : 'screen-compare');
   } else if (msg.mode==='guesser') {
     if (guestIsP1) {
-      gameVariant==='obo' ? guesserOboP1WaitForP2() : guesserP1WaitForP2();
+      // Guest is P1 = guesser — gets names and guesses immediately
+      gameVariant==='obo' ? guesserOboP1Init(msg.names||randomNames()) : guesserP1Init(msg.names||randomNames());
       showScreen(gameVariant==='obo' ? 'screen-guesser-obo-p1' : 'screen-guesser-p1');
     } else {
+      // Guest is P2 = assigner — waits for P1
       gameVariant==='obo' ? guesserOboP2Init(msg.names||randomNames()) : guesserP2Init(msg.names||randomNames());
       showScreen(gameVariant==='obo' ? 'screen-guesser-obo-p2' : 'screen-guesser-p2');
     }
   }
 }
 
-function p1ReceiveGuesserAssigned(msg) {
-  if (msg.names) guesserNames = msg.names;
-  gameVariant==='obo' ? guesserOboP1Init(guesserNames) : guesserP1Init(guesserNames);
-  if (gameVariant==='obo') showScreen('screen-guesser-obo-p1');
-}
+// p1ReceiveGuesserAssigned no longer needed in new flow (names come with start msg)
+// kept as no-op for safety
+function p1ReceiveGuesserAssigned(msg) { /* names sent with start message now */ }
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  PICKER MP
@@ -2002,54 +1994,37 @@ function compareGuestNewRound(names) {
 //  GUESSER MP  (P1 = guesser, P2 = assigner)
 // ─────────────────────────────────────────────────────────────────────────────
 let guesserNames = [];
-let guesserP2Assignments = {};   // P2's secret assignments
-let guesserP2SwapsLeft = 1;
-let guesserP1GuessObj = {};      // P1's guesses
+let guesserP2Assignments = {};
+let guesserP1GuessObj = {};
+let storedP1Guesses = null;
 
-// ── P2 (assigner) ────────────────────────────────────────────────────────────
+// ── P2 (assigner — goes second, after P1 locks in) ───────────────────────────
+
 function guesserP2Init(names) {
   guesserNames = names;
   guesserP2Assignments = {};
   CATEGORIES.forEach(c => guesserP2Assignments[c] = null);
-  guesserP2SwapsLeft = 1;
+  storedP1Guesses = null;
 
-  document.getElementById('guesser-p2-swap-label').textContent = 'SWAPS: 1/1';
-  document.getElementById('guesser-p2-swap-label').style.color = 'var(--cyan)';
   document.getElementById('guesser-p2-warn').textContent = '';
-  document.getElementById('guesser-p2-assign-phase').style.display = '';
-  document.getElementById('guesser-p2-waiting').style.display = 'none';
+  document.getElementById('guesser-p2-assign-phase').style.display = 'none';
+  document.getElementById('guesser-p2-waiting').style.display = '';
   document.getElementById('guesser-p2-result-phase').style.display = 'none';
+}
+
+function p2ReceiveGuesserGuesses(guesses) {
+  // P1 has locked in — now P2 assigns
+  storedP1Guesses = guesses;
+  document.getElementById('guesser-p2-waiting').style.display = 'none';
+  document.getElementById('guesser-p2-assign-phase').style.display = '';
+  document.getElementById('guesser-p2-warn').textContent = '';
 
   buildNameCards('guesser-p2-cards', guesserNames, guesserP2Assignments,
     (name, cat, i) => {
       onAssignGeneric(name, cat, i, 'guesser-p2-cards', guesserP2Assignments, guesserNames);
       buildAssignTable('guesser-p2-assign-table', guesserP2Assignments);
-    },
-    guesserP2SwapsLeft, i => guesserP2Swap(i));
+    }, 0, null);
   buildAssignTable('guesser-p2-assign-table', guesserP2Assignments);
-}
-
-function guesserP2Swap(idx) {
-  if (guesserP2SwapsLeft <= 0) return;
-  guesserP2SwapsLeft--;
-  document.getElementById('guesser-p2-swap-label').textContent = 'SWAPS: 0/1';
-  document.getElementById('guesser-p2-swap-label').style.color = 'var(--muted)';
-  for (const c of CATEGORIES) if (guesserP2Assignments[c] === guesserNames[idx]) guesserP2Assignments[c] = null;
-  guesserNames[idx] = randomNames(guesserNames)[0];
-  buildNameCards('guesser-p2-cards', guesserNames, guesserP2Assignments,
-    (name, cat, i) => {
-      onAssignGeneric(name, cat, i, 'guesser-p2-cards', guesserP2Assignments, guesserNames);
-      buildAssignTable('guesser-p2-assign-table', guesserP2Assignments);
-    },
-    guesserP2SwapsLeft, null);
-  buildAssignTable('guesser-p2-assign-table', guesserP2Assignments);
-}
-
-function guesserP2NewRound() {
-  // P2 starts a new round — pick new names and tell P1
-  const names = randomNames();
-  send({ type: 'guesser_new', names });
-  guesserP2Init(names);
 }
 
 function guesserP2Confirm() {
@@ -2058,55 +2033,42 @@ function guesserP2Confirm() {
     document.getElementById('guesser-p2-warn').textContent = `Still missing: ${unset.join(', ')}`;
     return;
   }
-  // Send the names to P1 so they can guess (do NOT send assignments)
-  send({ type: 'guesser_assigned', names: guesserNames });
-  document.getElementById('guesser-p2-assign-phase').style.display = 'none';
-  document.getElementById('guesser-p2-waiting').style.display = '';
-}
-
-function p2ReceiveGuesserGuesses(guesses) {
-  // P2 gets P1's guesses, scores them, sends results back
-  document.getElementById('guesser-p2-waiting').style.display = 'none';
-  document.getElementById('guesser-p2-result-phase').style.display = '';
-
+  // Score and reveal to both
+  const guesses = storedP1Guesses || {};
   let score = 0;
-  const content = document.getElementById('guesser-p2-result-content');
-  content.innerHTML = '';
   const resultRows = [];
-
   CATEGORIES.forEach(cat => {
     const correct = guesserP2Assignments[cat];
     const guessed = Object.keys(guesses).find(n => guesses[n] === cat);
     const match = correct === guessed;
     if (match) score++;
     resultRows.push({ cat, correct, guessed: guessed || null, match });
-
-    const row = document.createElement('div');
-    row.className = 'guess-result-card';
-    row.innerHTML = `<span class="${match ? 'tick' : 'cross'}" style="font-size:16px;">${match ? '✓' : '✗'}</span><span style="color:var(--cyan);min-width:90px;">${cat}:</span><span style="color:var(--muted);">You picked: <b style="color:var(--text)">${correct}</b></span><span style="color:var(--muted);">P1 guessed: <b style="color:${match ? 'var(--success)' : 'var(--warn)'}">${guessed || '?'}</b></span>`;
-    content.appendChild(row);
   });
 
-  const scoreEl = document.createElement('div');
-  scoreEl.className = 'score-big';
-  scoreEl.textContent = `${score}/3`;
-  content.appendChild(scoreEl);
+  // Show P2's result
+  showGuesserResult('guesser-p2-result-content', resultRows, score, 'p2');
+  document.getElementById('guesser-p2-assign-phase').style.display = 'none';
+  document.getElementById('guesser-p2-result-phase').style.display = '';
 
-  // Send scored results to P1
+  // Send full results to P1
   send({ type: 'guesser_result', score, resultRows });
 }
 
-function guesserP2RequestNew() {
-  guesserP2NewRound();
+function guesserP2NewRound() {
+  const names = randomNames();
+  send({ type: 'guesser_new', names });
+  guesserP2Init(names);
+  // P1 gets the names at same time
 }
 
-// ── P1 (guesser) ─────────────────────────────────────────────────────────────
+function guesserP2RequestNew() { guesserP2NewRound(); }
+
+// ── P1 (guesser — goes first) ─────────────────────────────────────────────────
 function guesserP1Init(names) {
   guesserNames = names;
   guesserP1GuessObj = {};
   CATEGORIES.forEach(c => guesserP1GuessObj[c] = null);
 
-  document.getElementById('guesser-p1-waiting').style.display = 'none';
   document.getElementById('guesser-p1-guess-phase').style.display = '';
   document.getElementById('guesser-p1-submitted').style.display = 'none';
   document.getElementById('guesser-p1-result-phase').style.display = 'none';
@@ -2116,18 +2078,14 @@ function guesserP1Init(names) {
     (name, cat, i) => {
       onAssignGeneric(name, cat, i, 'guesser-p1-cards', guesserP1GuessObj, guesserNames);
       buildAssignTable('guesser-p1-assign-table', guesserP1GuessObj);
-    },
-    0, null);
+    }, 0, null);
   buildAssignTable('guesser-p1-assign-table', guesserP1GuessObj);
 }
 
 function guesserP1WaitForP2() {
-  // P1 waiting screen shown at game start, before P2 assigns
-  document.getElementById('guesser-p1-waiting').textContent = 'Waiting for Player 2 to assign names…';
-  document.getElementById('guesser-p1-waiting').style.display = '';
-  document.getElementById('guesser-p1-guess-phase').style.display = 'none';
-  document.getElementById('guesser-p1-submitted').style.display = 'none';
-  document.getElementById('guesser-p1-result-phase').style.display = 'none';
+  // No longer needed as a waiting state — P1 now goes first.
+  // Called on game start from launchGame; just init the guessing screen.
+  // names come with the start message.
 }
 
 function guesserP1SubmitGuess() {
@@ -2136,45 +2094,52 @@ function guesserP1SubmitGuess() {
     document.getElementById('guesser-p1-warn').textContent = `Still missing: ${unset.join(', ')}`;
     return;
   }
-  // Convert to name→category map and send
   const nameMap = {};
   CATEGORIES.forEach(c => { if (guesserP1GuessObj[c]) nameMap[guesserP1GuessObj[c]] = c; });
   send({ type: 'guesser_guesses', guesses: nameMap });
-
   document.getElementById('guesser-p1-guess-phase').style.display = 'none';
   document.getElementById('guesser-p1-submitted').style.display = '';
 }
 
 function p1ShowGuesserResult(score, resultRows) {
-  // Called when P2 sends back scored results
   document.getElementById('guesser-p1-submitted').style.display = 'none';
   document.getElementById('guesser-p1-result-phase').style.display = '';
-
-  const content = document.getElementById('guesser-p1-result-content');
-  content.innerHTML = '';
-
-  resultRows.forEach(r => {
-    const row = document.createElement('div');
-    row.className = 'guess-result-card';
-    row.innerHTML = `<span class="${r.match ? 'tick' : 'cross'}" style="font-size:16px;">${r.match ? '✓' : '✗'}</span><span style="color:var(--cyan);min-width:90px;">${r.cat}:</span><span style="color:var(--muted);">P2 picked: <b style="color:var(--text)">${r.correct}</b></span><span style="color:var(--muted);">You guessed: <b style="color:${r.match ? 'var(--success)' : 'var(--warn)'}">${r.guessed || '?'}</b></span>`;
-    content.appendChild(row);
-  });
-
-  const scoreEl = document.createElement('div');
-  scoreEl.className = 'score-big';
-  scoreEl.textContent = `${score}/3`;
-  content.appendChild(scoreEl);
+  showGuesserResult('guesser-p1-result-content', resultRows, score, 'p1');
 }
 
 function guesserP1RequestNew() {
   send({ type: 'request_new_round' });
-  guesserP1WaitForP2();
-  document.getElementById('guesser-p1-waiting').textContent = 'Asking Player 2 for a new round…';
+  // Show a brief waiting message while P2 starts new round
+  document.getElementById('guesser-p1-result-phase').style.display = 'none';
+  document.getElementById('guesser-p1-submitted').textContent = 'Asking Player 2 for a new round…';
+  document.getElementById('guesser-p1-submitted').style.display = '';
 }
 
 function p1GuesserNewRound(names) {
-  // P2 started a new round, P1 gets the new names to guess
   guesserP1Init(names);
+}
+
+// Shared result renderer — perspective is 'p1' or 'p2'
+function showGuesserResult(containerId, resultRows, score, perspective) {
+  const content = document.getElementById(containerId);
+  content.innerHTML = '';
+  resultRows.forEach(r => {
+    const row = document.createElement('div');
+    row.className = 'guess-result-card';
+    const p1Label = perspective === 'p1' ? 'Your guess:' : "P1 guessed:";
+    const p2Label = perspective === 'p1' ? "P2's answer:" : 'Your answer:';
+    row.innerHTML = `
+      <span class="${r.match?'tick':'cross'}" style="font-size:16px;">${r.match?'✓':'✗'}</span>
+      <span style="color:var(--cyan);min-width:80px;">${r.cat}:</span>
+      <span style="color:var(--muted);">${p1Label} <b style="color:${r.match?'var(--success)':'var(--warn)'}">${r.guessed||'?'}</b></span>
+      <span style="color:var(--muted);">${p2Label} <b style="color:var(--text)">${r.correct}</b></span>
+    `;
+    content.appendChild(row);
+  });
+  const scoreEl = document.createElement('div');
+  scoreEl.className = 'score-big';
+  scoreEl.textContent = `${score}/3`;
+  content.appendChild(scoreEl);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2327,80 +2292,62 @@ function pickerOboGuestNext() {
 // ─────────────────────────────────────────────────────────────────────────────
 //  GUESSER OBO
 // ─────────────────────────────────────────────────────────────────────────────
-let gOboNames=[], gOboP2Assign={}, gOboP2SwapsLeft=1, gOboP2Queue=[], gOboP2Done=[];
+let gOboNames=[], gOboP2Assign={}, gOboP2Queue=[], gOboP2Done=[];
 let gOboP1Queue=[], gOboP1Done=[], gOboP1Guesses={};
 
 function guesserOboP2Init(names) {
-  gOboNames=[...names]; gOboP2Queue=[...names]; gOboP2Done=[]; gOboP2Assign={}; CATEGORIES.forEach(c=>gOboP2Assign[c]=null); gOboP2SwapsLeft=1;
-  document.getElementById('guesser-obo-p2-swap-label').textContent='SWAPS: 1/1';
-  document.getElementById('guesser-obo-p2-swap-label').style.color='var(--cyan)';
-  document.getElementById('guesser-obo-p2-active').style.display='';
-  document.getElementById('guesser-obo-p2-waiting').style.display='none';
+  gOboNames=[...names]; gOboP2Queue=[...names]; gOboP2Done=[]; gOboP2Assign={}; CATEGORIES.forEach(c=>gOboP2Assign[c]=null);
+  // P2 starts in waiting state — P1 goes first
+  document.getElementById('guesser-obo-p2-active').style.display='none';
+  document.getElementById('guesser-obo-p2-waiting').style.display='';
   document.getElementById('guesser-obo-p2-result').style.display='none';
-  renderOboDots('guesser-obo-p2-dots', names.length, 0);
+}
+function gOboP2Activate() {
+  // Called when P1 has locked in their guesses — now P2 assigns one by one
+  document.getElementById('guesser-obo-p2-waiting').style.display='none';
+  document.getElementById('guesser-obo-p2-active').style.display='';
+  renderOboDots('guesser-obo-p2-dots', gOboNames.length, 0);
   buildAssignTable('guesser-obo-p2-table', gOboP2Assign);
   gOboP2Next();
 }
 function gOboP2Next() {
   if (!gOboP2Queue.length) {
-    send({ type:'guesser_assigned', names:gOboNames });
+    // All assigned — score and reveal
+    const guesses = gOboStoredP1Guesses || {};
+    let score=0; const resultRows=[];
+    CATEGORIES.forEach(cat=>{
+      const correct=gOboP2Assign[cat], guessed=Object.keys(guesses).find(n=>guesses[n]===cat), match=correct===guessed;
+      if(match) score++;
+      resultRows.push({cat,correct,guessed:guessed||null,match});
+    });
     document.getElementById('guesser-obo-p2-active').style.display='none';
-    document.getElementById('guesser-obo-p2-waiting').style.display='';
+    document.getElementById('guesser-obo-p2-result').style.display='';
+    showGuesserResult('guesser-obo-p2-result-content', resultRows, score, 'p2');
+    send({ type:'guesser_result', score, resultRows });
     return;
   }
   const name=gOboP2Queue[0];
   renderOboDots('guesser-obo-p2-dots', gOboNames.length, gOboP2Done.length);
   document.getElementById('guesser-obo-p2-name').textContent=name;
-  document.getElementById('guesser-obo-p2-swap-x').classList.toggle('hidden', gOboP2SwapsLeft<=0);
   const usedCats=CATEGORIES.filter(c=>gOboP2Assign[c]);
   buildCatButtons('guesser-obo-p2-cat-btns', usedCats, cat=>{
     gOboP2Queue.shift(); gOboP2Assign[cat]=name; gOboP2Done.push(name);
     buildAssignTable('guesser-obo-p2-table', gOboP2Assign); gOboP2Next();
   });
 }
-function guesserOboP2Swap() {
-  if (gOboP2SwapsLeft<=0) return;
-  const all=gOboP2Queue.concat(gOboP2Done), avail=NAMES.filter(n=>!all.includes(n));
-  if (!avail.length) return;
-  gOboP2SwapsLeft--;
-  document.getElementById('guesser-obo-p2-swap-label').textContent='SWAPS: 0/1';
-  document.getElementById('guesser-obo-p2-swap-label').style.color='var(--muted)';
-  const newName=avail[Math.floor(Math.random()*avail.length)];
-  gOboNames[gOboP2Done.length]=newName; gOboP2Queue[0]=newName;
-  document.getElementById('guesser-obo-p2-name').textContent=newName;
-  document.getElementById('guesser-obo-p2-swap-x').classList.add('hidden');
-}
+let gOboStoredP1Guesses = null;
 function p2ReceiveGuesserGuessesObo(guesses) {
-  document.getElementById('guesser-obo-p2-waiting').style.display='none';
-  document.getElementById('guesser-obo-p2-result').style.display='';
-  let score=0; const content=document.getElementById('guesser-obo-p2-result-content'); content.innerHTML=''; const resultRows=[];
-  CATEGORIES.forEach(cat=>{
-    const correct=gOboP2Assign[cat], guessed=Object.keys(guesses).find(n=>guesses[n]===cat), match=correct===guessed;
-    if(match) score++;
-    resultRows.push({cat,correct,guessed:guessed||null,match});
-    const row=document.createElement('div'); row.className='guess-result-card';
-    row.innerHTML=`<span class="${match?'tick':'cross'}" style="font-size:16px;">${match?'✓':'✗'}</span><span style="color:var(--cyan);min-width:90px;">${cat}:</span><span style="color:var(--muted);">You picked: <b style="color:var(--text)">${correct}</b></span><span style="color:var(--muted);">P1 guessed: <b style="color:${match?'var(--success)':'var(--warn)'}">${guessed||'?'}</b></span>`;
-    content.appendChild(row);
-  });
-  const scoreEl=document.createElement('div'); scoreEl.className='score-big'; scoreEl.textContent=`${score}/3`; content.appendChild(scoreEl);
-  send({ type:'guesser_result', score, resultRows });
+  // P1 locked in — store guesses, unlock P2
+  gOboStoredP1Guesses = guesses;
+  gOboP2Activate();
 }
-function guesserOboP1WaitForP2() {
-  document.getElementById('guesser-obo-p1-waiting').textContent='Waiting for Player 2 to assign names…';
-  document.getElementById('guesser-obo-p1-waiting').style.display='';
-  document.getElementById('guesser-obo-p1-active').style.display='none';
-  document.getElementById('guesser-obo-p1-submitted').style.display='none';
-  document.getElementById('guesser-obo-p1-result').style.display='none';
-}
+function guesserOboP1WaitForP2() { /* no longer needed — P1 goes first */ }
 function guesserOboP1Init(names) {
   gOboNames=[...names]; gOboP1Guesses={}; CATEGORIES.forEach(c=>gOboP1Guesses[c]=null);
-  document.getElementById('guesser-obo-p1-waiting').style.display='none';
   document.getElementById('guesser-obo-p1-active').style.display='';
   document.getElementById('guesser-obo-p1-submitted').style.display='none';
   document.getElementById('guesser-obo-p1-result').style.display='none';
   document.getElementById('guesser-obo-p1-warn').textContent='';
-
-  // Build numbered name cards — all visible at once, ordered
   buildNameCardsNumbered('guesser-obo-p1-cards', names, gOboP1Guesses,
     (name, cat, i) => {
       onAssignGeneric(name, cat, i, 'guesser-obo-p1-cards', gOboP1Guesses, names);
@@ -2409,7 +2356,6 @@ function guesserOboP1Init(names) {
   );
   buildAssignTable('guesser-obo-p1-table', gOboP1Guesses);
 }
-
 function gOboP1Submit() {
   const unset = CATEGORIES.filter(c => !gOboP1Guesses[c]);
   if (unset.length) {
@@ -2425,13 +2371,7 @@ function gOboP1Submit() {
 function p1ShowGuesserResultObo(score, resultRows) {
   document.getElementById('guesser-obo-p1-submitted').style.display='none';
   document.getElementById('guesser-obo-p1-result').style.display='';
-  const content=document.getElementById('guesser-obo-p1-result-content'); content.innerHTML='';
-  resultRows.forEach(r=>{
-    const row=document.createElement('div'); row.className='guess-result-card';
-    row.innerHTML=`<span class="${r.match?'tick':'cross'}" style="font-size:16px;">${r.match?'✓':'✗'}</span><span style="color:var(--cyan);min-width:90px;">${r.cat}:</span><span style="color:var(--muted);">P2 picked: <b style="color:var(--text)">${r.correct}</b></span><span style="color:var(--muted);">You guessed: <b style="color:${r.match?'var(--success)':'var(--warn)'}">${r.guessed||'?'}</b></span>`;
-    content.appendChild(row);
-  });
-  const scoreEl=document.createElement('div'); scoreEl.className='score-big'; scoreEl.textContent=`${score}/3`; content.appendChild(scoreEl);
+  showGuesserResult('guesser-obo-p1-result-content', resultRows, score, 'p1');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Name Picker</title>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+  :root {
+    --bg:      #0f0f1a;
+    --card:    #1a1a2e;
+    --accent:  #e040fb;
+    --cyan:    #00e5ff;
+    --text:    #f0f0f0;
+    --muted:   #888aaa;
+    --btn:     #2a2a45;
+    --btnhov:  #3a3a60;
+    --success: #69f0ae;
+    --warn:    #ff5252;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 16px 60px;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; width: 100%; max-width: 560px; animation: fadein .25s ease; }
+  .screen.active { display: block; }
+  @keyframes fadein { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+
+  /* ── HEADER BAR ── */
+  .top-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 0; width: 100%; max-width: 560px;
+  }
+  .back-btn {
+    background: var(--btn); border: none; color: var(--muted);
+    font-family: inherit; font-size: 12px; padding: 8px 14px;
+    cursor: pointer; border-radius: 4px; transition: background .15s, color .15s;
+  }
+  .back-btn:hover { background: var(--btnhov); color: var(--text); }
+
+  /* ── TYPOGRAPHY ── */
+  .title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(20px, 5vw, 28px);
+    font-weight: 900; color: var(--accent);
+    text-align: center; letter-spacing: 4px;
+    text-shadow: 0 0 20px rgba(224,64,251,.4);
+  }
+  .subtitle { color: var(--muted); font-size: 12px; text-align: center; margin-top: 6px; }
+  .section-label { color: var(--cyan); font-size: 11px; letter-spacing: 2px; margin-bottom: 8px; }
+
+  /* ── MODE CARDS ── */
+  .mode-card {
+    background: var(--card); border: 1px solid transparent;
+    border-radius: 8px; padding: 20px 24px; margin: 8px 0;
+    cursor: pointer; transition: border-color .2s, background .2s;
+  }
+  .mode-card:hover { border-color: var(--cyan); background: #1f1f38; }
+  .mode-card .card-title {
+    font-family: 'Orbitron', monospace; font-size: 13px;
+    color: var(--cyan); letter-spacing: 2px; margin-bottom: 6px;
+  }
+  .mode-card .card-desc { color: var(--muted); font-size: 11px; line-height: 1.7; }
+  .mode-tag {
+    display: inline-block; font-size: 10px; padding: 2px 8px;
+    border-radius: 20px; margin-bottom: 8px;
+  }
+  .tag-mp { background: rgba(224,64,251,.15); color: var(--accent); border: 1px solid var(--accent); }
+  .tag-sp { background: rgba(0,229,255,.1); color: var(--cyan); border: 1px solid var(--cyan); }
+
+  /* ── DIVIDER ── */
+  .divider { height: 1px; background: var(--accent); opacity: .3; margin: 20px 0; }
+
+  /* ── LOBBY ── */
+  .lobby-box {
+    background: var(--card); border-radius: 8px; padding: 28px 32px;
+    text-align: center; margin: 16px 0;
+  }
+  .room-code {
+    font-family: 'Orbitron', monospace; font-size: clamp(28px, 8vw, 42px);
+    font-weight: 900; color: var(--accent); letter-spacing: 8px;
+    text-shadow: 0 0 30px rgba(224,64,251,.5);
+    margin: 12px 0;
+  }
+  .input-row { display: flex; gap: 8px; margin: 12px 0; }
+  input[type=text] {
+    flex: 1; background: #111128; border: 1px solid var(--btn);
+    color: var(--text); font-family: inherit; font-size: 14px;
+    padding: 10px 14px; border-radius: 4px; outline: none;
+    letter-spacing: 3px; text-align: center; text-transform: uppercase;
+    transition: border-color .2s;
+  }
+  input[type=text]:focus { border-color: var(--cyan); }
+  input[type=text]::placeholder { letter-spacing: 1px; text-transform: none; color: var(--muted); font-size:12px; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    background: var(--btn); border: none; color: var(--text);
+    font-family: inherit; font-size: 12px; font-weight: bold;
+    padding: 10px 20px; border-radius: 4px; cursor: pointer;
+    transition: background .15s, transform .1s; white-space: nowrap;
+  }
+  .btn:hover:not(:disabled) { background: var(--btnhov); transform: translateY(-1px); }
+  .btn:active:not(:disabled) { transform: translateY(0); }
+  .btn:disabled { opacity: .35; cursor: not-allowed; }
+  .btn-accent { background: var(--accent); color: var(--bg); }
+  .btn-accent:hover:not(:disabled) { background: #cc33e0; }
+  .btn-success { background: var(--success); color: var(--bg); }
+  .btn-success:hover:not(:disabled) { background: #4ecf8a; }
+  .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+
+  /* ── STATUS BADGE ── */
+  .status-badge {
+    font-size: 11px; padding: 4px 12px; border-radius: 20px;
+    display: inline-block; margin: 6px 0;
+  }
+  .badge-wait { background: rgba(136,138,170,.15); color: var(--muted); border: 1px solid var(--muted); }
+  .badge-ok { background: rgba(105,240,174,.15); color: var(--success); border: 1px solid var(--success); }
+  .badge-warn { background: rgba(255,82,82,.15); color: var(--warn); border: 1px solid var(--warn); }
+
+  /* ── NAME CARDS ── */
+  .name-cards-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 16px 0; }
+  .name-card {
+    background: var(--card); border-radius: 8px; padding: 16px 18px;
+    min-width: 140px; flex: 1; max-width: 170px;
+    border: 1px solid transparent; transition: border-color .2s;
+    position: relative;
+  }
+  .name-card .card-name {
+    font-family: 'Orbitron', monospace; font-size: 13px;
+    font-weight: 700; color: var(--text); margin-bottom: 12px; text-align: center;
+  }
+  .radio-opt {
+    display: block; padding: 6px 10px; margin: 3px 0;
+    border-radius: 4px; cursor: pointer; font-size: 11px;
+    border: 1px solid transparent; text-align: center;
+    transition: background .15s, border-color .15s, color .15s;
+    user-select: none;
+  }
+  .radio-opt:hover { background: var(--btnhov); }
+  .radio-opt.selected { border-color: var(--cyan); color: var(--cyan); background: rgba(0,229,255,.08); }
+  .swap-x {
+    position: absolute; top: 6px; right: 8px;
+    color: var(--warn); font-size: 14px; cursor: pointer;
+    opacity: .7; transition: opacity .15s;
+  }
+  .swap-x:hover { opacity: 1; }
+  .swap-x.hidden { display: none; }
+
+  /* ── ASSIGN TABLE ── */
+  .assign-table { width: 100%; margin: 12px 0; }
+  .assign-row { display: flex; align-items: center; padding: 6px 0; gap: 12px; }
+  .assign-cat { color: var(--cyan); font-size: 12px; width: 110px; flex-shrink: 0; }
+  .assign-val { font-size: 13px; }
+  .assign-val.filled { color: var(--success); font-weight: bold; }
+  .assign-val.empty { color: var(--muted); }
+
+  /* ── ONE BY ONE ── */
+  .current-name-box {
+    background: var(--card); border-radius: 8px; padding: 28px 32px;
+    text-align: center; margin: 16px 0; position: relative;
+  }
+  .current-name-label { color: var(--muted); font-size: 11px; letter-spacing: 2px; margin-bottom: 8px; }
+  .current-name-big {
+    font-family: 'Orbitron', monospace; font-size: clamp(20px, 6vw, 32px);
+    font-weight: 900; color: var(--text);
+  }
+  .cat-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 16px 0; }
+
+  /* ── WAITING ── */
+  .waiting-msg { text-align: center; color: var(--muted); font-size: 12px; margin: 20px 0; }
+  .pulse { animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  @keyframes coinSpin { from{transform:rotateY(0deg)} to{transform:rotateY(360deg)} }
+  @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+  /* ── COMPARE RESULTS ── */
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .compare-col { background: var(--card); border-radius: 8px; padding: 16px; }
+  .compare-col-title { font-size: 11px; color: var(--cyan); letter-spacing: 2px; margin-bottom: 12px; text-align: center; }
+  .compare-item { margin: 6px 0; font-size: 12px; }
+  .compare-item .ci-cat { color: var(--muted); font-size: 10px; }
+  .compare-item .ci-name { color: var(--text); font-size: 13px; }
+
+  /* ── GUESSER ── */
+  .guess-result-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 12px; flex-wrap: wrap; }
+  .tick { color: var(--success); } .cross { color: var(--warn); }
+
+  /* ── SCORE ── */
+  .score-big {
+    font-family: 'Orbitron', monospace; font-size: clamp(32px,10vw,52px);
+    font-weight: 900; text-align: center;
+    background: linear-gradient(135deg, var(--accent), var(--cyan));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin: 12px 0;
+  }
+
+  /* ══════════════════════════════════════
+     SETTINGS MODAL
+  ══════════════════════════════════════ */
+  .modal-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.75); z-index: 100;
+    align-items: flex-start; justify-content: center;
+    overflow-y: auto; padding: 24px 16px 40px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: #16162a; border: 1px solid rgba(224,64,251,.3);
+    border-radius: 12px; padding: 28px 28px 32px;
+    width: 100%; max-width: 520px;
+    animation: fadein .2s ease;
+  }
+  .modal-title {
+    font-family: 'Orbitron', monospace; font-size: 15px;
+    color: var(--accent); letter-spacing: 3px; margin-bottom: 6px;
+  }
+  .modal-subtitle { color: var(--muted); font-size: 11px; margin-bottom: 24px; }
+
+  /* category inputs */
+  .cat-inputs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+  .cat-input-wrap { flex: 1; min-width: 120px; }
+  .cat-input-wrap label { display: block; font-size: 10px; color: var(--cyan); letter-spacing: 2px; margin-bottom: 4px; }
+  .cat-input-wrap input {
+    width: 100%; background: #111128; border: 1px solid var(--btn);
+    color: var(--text); font-family: inherit; font-size: 13px;
+    padding: 8px 10px; border-radius: 4px; outline: none;
+    letter-spacing: 0; text-align: left; text-transform: none;
+  }
+  .cat-input-wrap input:focus { border-color: var(--accent); }
+
+  /* names list */
+  .names-list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .names-count { font-size: 11px; color: var(--muted); }
+  .names-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 6px; max-height: 280px; overflow-y: auto;
+    padding-right: 4px; margin-bottom: 14px;
+  }
+  .names-grid::-webkit-scrollbar { width: 4px; }
+  .names-grid::-webkit-scrollbar-track { background: transparent; }
+  .names-grid::-webkit-scrollbar-thumb { background: var(--btn); border-radius: 2px; }
+  .name-chip {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--btn); border-radius: 4px;
+    padding: 6px 10px; font-size: 12px; color: var(--text);
+    border: 1px solid transparent;
+  }
+  .name-chip .chip-del {
+    color: var(--warn); cursor: pointer; font-size: 14px;
+    line-height: 1; margin-left: 8px; opacity: .6;
+    transition: opacity .15s;
+  }
+  .name-chip .chip-del:hover { opacity: 1; }
+  .add-name-row { display: flex; gap: 8px; }
+  .add-name-row input {
+    flex: 1; letter-spacing: 0; text-align: left; text-transform: none;
+    font-size: 13px;
+  }
+  .settings-warn { color: var(--warn); font-size: 11px; margin: 6px 0; min-height: 16px; }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* ── RESULT POPUP ── */
+  .result-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.8); z-index: 200;
+    align-items: center; justify-content: center;
+  }
+  .result-overlay.open { display: flex; }
+  .result-box {
+    background: #16162a; border: 1px solid var(--success);
+    border-radius: 12px; padding: 32px 36px; text-align: center;
+    max-width: 400px; width: 90%; animation: fadein .2s ease;
+  }
+  .result-box .res-title {
+    font-family: 'Orbitron', monospace; font-size: 18px;
+    color: var(--success); letter-spacing: 3px; margin-bottom: 20px;
+  }
+
+  /* ── UTILS ── */
+  .mt8 { margin-top: 8px; }
+  .mt16 { margin-top: 16px; }
+  .center { text-align: center; }
+  .small { font-size: 11px; color: var(--muted); }
+  .warn-text { color: var(--warn); font-size: 12px; text-align: center; margin: 8px 0; min-height: 18px; }
+  .success-text { color: var(--success); font-size: 12px; text-align: center; margin: 8px 0; }
+
+  /* settings gear btn */
+  .gear-btn {
+    background: none; border: 1px solid var(--btn); color: var(--muted);
+    font-size: 16px; width: 36px; height: 36px; border-radius: 6px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: border-color .15s, color .15s;
+  }
+  .gear-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── ENTRY SCREEN ── */
+  .entry-box {
+    background: var(--card); border-radius: 10px; padding: 32px 28px;
+    margin: 12px 0; border: 1px solid transparent;
+    transition: border-color .2s;
+  }
+  .entry-box:hover { border-color: rgba(255,255,255,.06); }
+  .entry-choice-row { display: flex; gap: 14px; margin-top: 32px; }
+  .entry-choice-btn {
+    flex: 1; background: var(--btn); border: 1px solid transparent;
+    color: var(--text); font-family: inherit; font-size: 13px;
+    font-weight: bold; padding: 18px 10px; border-radius: 8px;
+    cursor: pointer; transition: border-color .2s, background .2s;
+    letter-spacing: 1px;
+  }
+  .entry-choice-btn:hover { background: var(--btnhov); }
+  .entry-choice-btn.host-btn { border-color: var(--accent); color: var(--accent); }
+  .entry-choice-btn.host-btn:hover { background: rgba(224,64,251,.1); }
+  .entry-choice-btn.join-btn { border-color: var(--cyan); color: var(--cyan); }
+  .entry-choice-btn.join-btn:hover { background: rgba(0,229,255,.08); }
+  .entry-choice-icon { font-size: 22px; display: block; margin-bottom: 8px; }
+  .entry-form { margin-top: 24px; }
+  input[type=password] {
+    width: 100%; background: #111128; border: 1px solid var(--btn);
+    color: var(--text); font-family: inherit; font-size: 14px;
+    padding: 10px 14px; border-radius: 4px; outline: none;
+    letter-spacing: 2px; transition: border-color .2s;
+  }
+  input[type=password]:focus { border-color: var(--accent); }
+  input[type=password]::placeholder { letter-spacing: 1px; color: var(--muted); font-size: 12px; }
+  .entry-err { color: var(--warn); font-size: 11px; margin-top: 6px; min-height: 16px; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     SETTINGS MODAL
+═══════════════════════════════════════════ -->
+<div class="modal-backdrop" id="settings-modal">
+  <div class="modal">
+    <div class="modal-title">⚙ SETTINGS</div>
+    <div class="modal-subtitle">Changes apply to all future rounds in this session.</div>
+
+    <div class="section-label">CATEGORIES</div>
+    <div class="cat-inputs">
+      <div class="cat-input-wrap">
+        <label>CATEGORY A</label>
+        <input type="text" id="cat-a-input" placeholder="Hero" maxlength="20"/>
+      </div>
+      <div class="cat-input-wrap">
+        <label>CATEGORY B</label>
+        <input type="text" id="cat-b-input" placeholder="Sidekick" maxlength="20"/>
+      </div>
+      <div class="cat-input-wrap">
+        <label>CATEGORY C</label>
+        <input type="text" id="cat-c-input" placeholder="Villain" maxlength="20"/>
+      </div>
+    </div>
+
+    <div class="names-list-header">
+      <div class="section-label" style="margin-bottom:0;">NAME POOL</div>
+      <div class="names-count" id="names-count">26 names</div>
+    </div>
+    <div class="names-grid" id="names-grid"></div>
+
+    <div class="add-name-row">
+      <input type="text" id="new-name-input" placeholder="Add a name…" maxlength="30" style="letter-spacing:0;text-align:left;text-transform:none;font-size:13px;"/>
+      <button class="btn btn-accent" onclick="settingsAddName()">ADD</button>
+    </div>
+    <div class="settings-warn" id="settings-warn"></div>
+
+    <div class="modal-footer">
+      <button class="btn" onclick="settingsReset()">RESET DEFAULTS</button>
+      <button class="btn btn-accent" onclick="settingsSave()">SAVE &amp; CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     RESULT POPUP (solo modes)
+═══════════════════════════════════════════ -->
+<div class="result-overlay" id="result-overlay">
+  <div class="result-box">
+    <div class="res-title">✦ RESULT ✦</div>
+    <div class="assign-table" id="result-assign-table" style="text-align:left;"></div>
+    <div class="btn-row" style="margin-top:24px;">
+      <button class="btn" id="result-play-again-btn">↺ PLAY AGAIN</button>
+      <button class="btn" onclick="closeResult(); showScreen('screen-home');">⌂ MENU</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN: ENTRY (landing page)
+═══════════════════════════════════════════ -->
+<div class="screen active" id="screen-entry">
+  <div style="padding-top: 56px; padding-bottom: 32px; text-align:center;">
+    <div class="title">✦ NAME PICKER ✦</div>
+    <div class="subtitle" style="margin-top:10px;">Who are you?</div>
+  </div>
+
+  <div class="entry-choice-row">
+    <button class="entry-choice-btn host-btn" onclick="showEntryForm('host')">
+      <span class="entry-choice-icon">👑</span>
+      HOST
+    </button>
+    <button class="entry-choice-btn join-btn" onclick="showEntryForm('join')">
+      <span class="entry-choice-icon">🎮</span>
+      JOIN
+    </button>
+  </div>
+
+  <!-- Host password form -->
+  <div class="entry-form" id="entry-host-form" style="display:none;">
+    <div class="section-label" style="margin-top:24px;">HOST PASSWORD</div>
+    <input type="password" id="entry-password-input" placeholder="Enter password…" autocomplete="off"/>
+    <div class="entry-err" id="entry-pw-err"></div>
+    <div class="btn-row" style="margin-top:12px;">
+      <button class="btn btn-accent" onclick="submitHostPassword()">ENTER</button>
+    </div>
+  </div>
+
+  <!-- Join game code form -->
+  <div class="entry-form" id="entry-join-form" style="display:none;">
+    <div class="section-label" style="margin-top:24px;">GAME CODE</div>
+    <input type="text" id="entry-join-code" placeholder="e.g. ABC123" maxlength="6"/>
+    <div class="entry-err" id="entry-join-err"></div>
+    <div class="btn-row" style="margin-top:12px;">
+      <button class="btn btn-accent" onclick="submitJoinCode()">JOIN GAME</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN: HOME (host only — all modes)
+═══════════════════════════════════════════ -->
+<div class="screen" id="screen-home">
+  <div style="display:flex; justify-content:space-between; align-items:center; width:100%; padding-top:16px;">
+    <button class="back-btn" onclick="showScreen('screen-entry')">← BACK</button>
+    <button class="gear-btn" onclick="openSettings()" title="Settings">⚙</button>
+  </div>
+  <div style="padding-top: 16px; padding-bottom: 24px;">
+    <div class="title">✦ NAME PICKER ✦</div>
+  </div>
+
+  <div class="section-label">SINGLE PLAYER</div>
+
+  <div class="mode-card" onclick="soloStart('all_at_once')">
+    <span class="mode-tag tag-sp">SOLO</span>
+    <div class="card-title">ALL AT ONCE</div>
+    <div class="card-desc">
+      3 unique names revealed simultaneously.<br>
+      You have 1 swap per round. Assign one person per category.
+    </div>
+  </div>
+
+  <div class="mode-card" onclick="soloStart('one_by_one')">
+    <span class="mode-tag tag-sp">SOLO</span>
+    <div class="card-title">ONE BY ONE</div>
+    <div class="card-desc">
+      Names appear one at a time.<br>
+      Swap 1 name before assigning. Roles lock once chosen.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="section-label">MULTIPLAYER</div>
+
+  <div class="mode-card" onclick="goLobby('picker')">
+    <span class="mode-tag tag-mp">2 PLAYERS</span>
+    <div class="card-title">PICKER</div>
+    <div class="card-desc">
+      Player 1 draws 3 names and assigns a category to each.<br>
+      Player 2 watches the reveal happen live.
+    </div>
+  </div>
+
+  <div class="mode-card" onclick="goLobby('compare')">
+    <span class="mode-tag tag-mp">2 PLAYERS</span>
+    <div class="card-title">COMPARE RANKINGS</div>
+    <div class="card-desc">
+      Both players get the same 3 names and rank independently.<br>
+      Then see how your choices lined up.
+    </div>
+  </div>
+
+  <div class="mode-card" onclick="goLobby('guesser')">
+    <span class="mode-tag tag-mp">2 PLAYERS</span>
+    <div class="card-title">GUESSER</div>
+    <div class="card-desc">
+      Player 1 assigns categories to 3 names.<br>
+      Player 2 tries to guess Player 1's choices. Score points for matches!
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN: SOLO — ALL AT ONCE
+═══════════════════════════════════════════ -->
+<div class="screen" id="screen-solo-all">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showScreen('screen-home')">← BACK</button>
+    <span id="solo-all-swap-label" style="font-size:12px; color:var(--cyan);">SWAPS: 1/1</span>
+  </div>
+  <div class="title" style="font-size:16px; letter-spacing:2px;">ALL AT ONCE</div>
+  <div class="subtitle mt8">Assign each name to a category, then confirm.</div>
+
+  <div class="name-cards-row" id="solo-all-cards"></div>
+  <div class="divider"></div>
+  <div class="assign-table" id="solo-all-assign-table"></div>
+  <div class="warn-text" id="solo-all-warn"></div>
+  <div class="btn-row">
+    <button class="btn" onclick="soloAllNewRound()">↺ NEW ROUND</button>
+    <button class="btn btn-accent" onclick="soloAllConfirm()">✓ CONFIRM</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN: SOLO — ONE BY ONE
+═══════════════════════════════════════════ -->
+<div class="screen" id="screen-solo-obo">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showScreen('screen-home')">← BACK</button>
+    <span id="solo-obo-swap-label" style="font-size:12px; color:var(--cyan);">SWAPS: 1/1</span>
+  </div>
+  <div class="title" style="font-size:16px; letter-spacing:2px;">ONE BY ONE</div>
+
+  <div class="current-name-box">
+    <div class="current-name-label" id="solo-obo-progress">Name 1 of 3</div>
+    <div class="current-name-big" id="solo-obo-name">—</div>
+    <span id="solo-obo-swap-x" class="swap-x" style="position:absolute;top:10px;right:14px;" onclick="soloOboSwap()">✕</span>
+  </div>
+
+  <div class="cat-btns" id="solo-obo-cat-btns"></div>
+
+  <div class="divider"></div>
+  <div class="assign-table" id="solo-obo-assign-table"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN: GUEST WAITING (persistent — shown when host is choosing)
+═══════════════════════════════════════════ -->
+<div class="screen" id="screen-guest-waiting">
+  <div class="top-bar">
+    <button class="back-btn" onclick="goHome()">← QUIT</button>
+  </div>
+  <div style="display:flex; flex-direction:column; align-items:center; padding-top:60px; gap:20px;">
+    <div class="title" style="font-size:18px; letter-spacing:3px;">CONNECTED</div>
+    <div class="waiting-msg pulse" id="guest-waiting-msg">Host is choosing a game…</div>
+    <div style="width:60px; height:60px; border:2px solid var(--accent); border-top-color:transparent; border-radius:50%; animation: spin 1s linear infinite; margin-top:20px;"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN: COIN FLIP
+═══════════════════════════════════════════ -->
+<div class="screen" id="screen-coinflip">
+  <div style="display:flex; flex-direction:column; align-items:center; padding-top:40px; gap:16px; text-align:center;">
+    <div class="title" style="font-size:16px; letter-spacing:3px;">DECIDING ROLES</div>
+    <div class="subtitle" id="coinflip-subtitle">Flipping for who goes first…</div>
+    <div id="coinflip-coin" style="
+      width:100px; height:100px; margin:24px auto;
+      border-radius:50%;
+      background: conic-gradient(var(--accent) 0deg 180deg, var(--cyan) 180deg 360deg);
+      display:flex; align-items:center; justify-content:center;
+      font-size:32px; font-weight:900;
+      box-shadow: 0 0 40px rgba(224,64,251,.4);
+      animation: coinSpin 0.12s linear infinite;
+    ">?</div>
+    <div id="coinflip-result" style="display:none; animation: fadein .4s ease;">
+      <div style="font-size:13px; color:var(--muted); letter-spacing:2px; margin-bottom:8px;">FIRST PICK GOES TO</div>
+      <div id="coinflip-winner" style="font-family:'Orbitron',monospace; font-size:clamp(22px,6vw,32px); font-weight:900; color:var(--accent); text-shadow:0 0 20px rgba(224,64,251,.5);"></div>
+      <div id="coinflip-role-desc" style="color:var(--muted); font-size:12px; margin-top:8px;"></div>
+    </div>
+  </div>
+</div>
+
+
+<div class="screen" id="screen-lobby">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showScreen('screen-home')">← BACK</button>
+    <span id="lobby-mode-tag" class="mode-tag tag-mp">MODE</span>
+  </div>
+
+  <div id="lobby-host">
+    <div class="lobby-box">
+      <div class="section-label">YOUR ROOM CODE</div>
+      <div class="room-code" id="host-code">——</div>
+      <div class="small mt8">Share this with Player 2</div>
+      <div id="host-status" class="status-badge badge-wait mt8">Waiting for Player 2…</div>
+    </div>
+    <div class="center">
+      <button class="btn btn-accent" id="start-game-btn" disabled onclick="hostStartGame()">START GAME</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN: PICKER (host / P1)
+═══════════════════════════════════════════ -->
+<div class="screen" id="screen-picker-host">
+  <div class="top-bar">
+    <button class="back-btn" onclick="mpMenu()">← MENU</button>  <!-- goHome() disconnects peer then goes to entry -->
+    <span id="picker-swap-label" style="font-size:12px; color:var(--cyan);">SWAPS: 1/1</span>
+  </div>
+  <div class="title" style="font-size:16px; letter-spacing:2px;">PICKER — YOU ARE P1</div>
+  <div class="subtitle mt8">Assign each name to a category, then confirm.</div>
+
+  <div class="name-cards-row" id="picker-cards"></div>
+  <div class="divider"></div>
+  <div class="assign-table" id="picker-assign-table"></div>
+  <div class="warn-text" id="picker-warn"></div>
+  <div class="btn-row">
+    <button class="btn" onclick="pickerNewRound()">↺ NEW ROUND</button>
+    <button class="btn btn-accent" onclick="pickerConfirm()">✓ CONFIRM</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN: PICKER (guest / P2)
+═══════════════════════════════════════════ -->
+<div class="screen" id="screen-picker-guest">
+  <div class="top-bar">
+    <button class="back-btn" onclick="mpMenu()">← MENU</button>
+  </div>
+  <div class="title" style="font-size:16px; letter-spacing:2px;">PICKER — YOU ARE P2</div>
+  <div id="picker-guest-waiting" class="waiting-msg pulse">Waiting for Player 1 to assign names…</div>
+  <div id="picker-guest-result" style="display:none;">
+    <div class="success-text">✦ PLAYER 1's CHOICES ✦</div>
+    <div class="assign-table" id="picker-guest-assign-table"></div>
+  </div>
+  <div class="btn-row" id="picker-guest-btns" style="display:none;">
+    <button class="btn" onclick="guestRequestNewRound()">↺ PLAY AGAIN</button>
+    <button class="btn" onclick="mpMenu()">⌂ MENU</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN: COMPARE
+═══════════════════════════════════════════ -->
+<div class="screen" id="screen-compare">
+  <div class="top-bar">
+    <button class="back-btn" onclick="mpMenu()">← MENU</button>
+    <span id="compare-role-label" style="font-size:11px; color:var(--cyan);"></span>
+  </div>
+  <div class="title" style="font-size:16px; letter-spacing:2px;">COMPARE RANKINGS</div>
+
+  <div id="compare-ranking-phase">
+    <div class="subtitle mt8">Assign each name. Don't show your partner!</div>
+    <div id="compare-swap-label" style="font-size:11px; color:var(--cyan); text-align:right; margin: 8px 0;">SWAPS: 1/1</div>
+    <div class="name-cards-row" id="compare-cards"></div>
+    <div class="divider"></div>
+    <div class="assign-table" id="compare-assign-table"></div>
+    <div class="warn-text" id="compare-warn"></div>
+    <div class="btn-row">
+      <button class="btn btn-accent" onclick="compareConfirm()">✓ LOCK IN</button>
+    </div>
+    <div id="compare-waiting-other" class="waiting-msg pulse" style="display:none;">Waiting for your partner to lock in…</div>
+  </div>
+
+  <div id="compare-results-phase" style="display:none;">
+    <div class="success-text mt16">✦ RESULTS ✦</div>
+    <div class="compare-grid" id="compare-results-grid"></div>
+    <div class="center mt16">
+      <div class="small">Matches:</div>
+      <div class="score-big" id="compare-match-score">0/3</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="compareNewRound()">↺ NEW ROUND</button>
+      <button class="btn" onclick="mpMenu()">⌂ MENU</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN: GUESSER P1
+═══════════════════════════════════════════ -->
+<div class="screen" id="screen-guesser-p1">
+  <div class="top-bar">
+    <button class="back-btn" onclick="mpMenu()">← MENU</button>
+    <span id="guesser-p1-swap-label" style="font-size:12px; color:var(--cyan);">SWAPS: 1/1</span>
+  </div>
+  <div class="title" style="font-size:16px; letter-spacing:2px;">GUESSER — YOU ARE P1</div>
+  <div class="subtitle mt8">Assign names secretly. P2 will try to guess your choices!</div>
+
+  <div id="guesser-p1-assign-phase">
+    <div class="name-cards-row" id="guesser-p1-cards"></div>
+    <div class="divider"></div>
+    <div class="assign-table" id="guesser-p1-assign-table"></div>
+    <div class="warn-text" id="guesser-p1-warn"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="guesserP1NewRound()">↺ NEW ROUND</button>
+      <button class="btn btn-accent" onclick="guesserP1Confirm()">✓ CONFIRM</button>
+    </div>
+  </div>
+
+  <div id="guesser-p1-waiting" style="display:none;" class="waiting-msg pulse">
+    P2 is guessing… stand by!
+  </div>
+
+  <div id="guesser-p1-result-phase" style="display:none;">
+    <div class="success-text">✦ P2's GUESSES ✦</div>
+    <div id="guesser-p1-result-content"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="guesserP1NewRound()">↺ NEW ROUND</button>
+      <button class="btn" onclick="mpMenu()">⌂ MENU</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN: GUESSER P2
+═══════════════════════════════════════════ -->
+<div class="screen" id="screen-guesser-p2">
+  <div class="top-bar">
+    <button class="back-btn" onclick="mpMenu()">← MENU</button>
+  </div>
+  <div class="title" style="font-size:16px; letter-spacing:2px;">GUESSER — YOU ARE P2</div>
+
+  <div id="guesser-p2-waiting" class="waiting-msg pulse">
+    Waiting for Player 1 to assign names…
+  </div>
+
+  <div id="guesser-p2-guess-phase" style="display:none;">
+    <div class="subtitle mt8">Guess what categories P1 assigned to each name!</div>
+    <div class="name-cards-row" id="guesser-p2-cards"></div>
+    <div class="divider"></div>
+    <div class="assign-table" id="guesser-p2-assign-table"></div>
+    <div class="warn-text" id="guesser-p2-warn"></div>
+    <div class="btn-row">
+      <button class="btn btn-accent" onclick="guesserP2Confirm()">✓ SUBMIT GUESSES</button>
+    </div>
+  </div>
+
+  <div id="guesser-p2-result-phase" style="display:none;">
+    <div class="success-text">✦ YOUR SCORE ✦</div>
+    <div id="guesser-p2-result-content"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="guesserP2RequestNew()">↺ PLAY AGAIN</button>
+      <button class="btn" onclick="mpMenu()">⌂ MENU</button>
+    </div>
+  </div>
+</div>
+
+<!-- JAVASCRIPT -->
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+//  DEFAULT DATA
+// ─────────────────────────────────────────────────────────────────────────────
+const HOST_PASSWORD = "password"; // ← change this to set the host password
+
+const DEFAULT_CATEGORIES = ["Hero", "Sidekick", "Villain"];
+const DEFAULT_NAMES = [
+  "Alice","Bob","Charlie","Diana","Edward","Fiona","George","Hannah",
+  "Ivan","Julia","Kevin","Laura","Marcus","Nina","Oscar","Penny",
+  "Quinn","Rosa","Sam","Tara","Uma","Victor","Wendy","Xander","Yara","Zoe"
+];
+
+let CATEGORIES = [...DEFAULT_CATEGORIES];
+let NAMES      = [...DEFAULT_NAMES];
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  GLOBAL STATE
+// ─────────────────────────────────────────────────────────────────────────────
+let peer = null, conn = null;
+let myRole = null;       // 'host' | 'guest'
+let currentMode = null;
+let thisGameP1 = null;   // 'host' | 'guest' — resolved after coin flip
+
+// solo
+let soloAllNames = [], soloAllAssignments = {}, soloAllSwapsLeft = 1;
+let soloOboQueue = [], soloOboCurrent = '', soloOboAssigned = [], soloOboAssignments = {}, soloOboSwapsLeft = 1;
+
+// picker mp
+let pickerNames = [], pickerAssignments = {}, pickerSwapsLeft = 1;
+
+// compare mp
+let compareNames = [], compareMyAssignments = {}, compareTheirAssignments = {};
+let compareMyLocked = false, compareTheirLocked = false, compareSwapsLeft = 1;
+
+// guesser mp
+let guesserNames = [], guesserP1Assignments = {}, guesserP2Guesses = {}, guesserP1SwapsLeft = 1;
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SCREEN ROUTING
+// ─────────────────────────────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// Full disconnect — back to entry screen
+function goHome() {
+  if (conn) { try { conn.close(); } catch(e){} conn = null; }
+  if (peer) { try { peer.destroy(); } catch(e){} peer = null; }
+  myRole = null; currentMode = null; thisGameP1 = null;
+  showScreen('screen-entry');
+}
+
+// Host returns to mode-select KEEPING the connection alive
+function returnToMenu() {
+  currentMode = null; thisGameP1 = null;
+  if (conn && conn.open) send({ type: 'host_choosing' });
+  showScreen('screen-home');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  ENTRY SCREEN
+// ─────────────────────────────────────────────────────────────────────────────
+function showEntryForm(type) {
+  document.getElementById('entry-host-form').style.display = type==='host' ? '' : 'none';
+  document.getElementById('entry-join-form').style.display = type==='join' ? '' : 'none';
+  document.getElementById('entry-pw-err').textContent = '';
+  document.getElementById('entry-join-err').textContent = '';
+  if (type==='host') {
+    document.getElementById('entry-password-input').value = '';
+    setTimeout(()=>document.getElementById('entry-password-input').focus(), 50);
+  } else {
+    document.getElementById('entry-join-code').value = '';
+    setTimeout(()=>document.getElementById('entry-join-code').focus(), 50);
+  }
+}
+
+function submitHostPassword() {
+  const val = document.getElementById('entry-password-input').value;
+  if (val !== HOST_PASSWORD) {
+    document.getElementById('entry-pw-err').textContent = 'Incorrect password.';
+    document.getElementById('entry-password-input').value = '';
+    document.getElementById('entry-password-input').focus();
+    return;
+  }
+  myRole = 'host';
+  showScreen('screen-home');
+}
+
+function submitJoinCode() {
+  const raw = document.getElementById('entry-join-code').value.trim().toUpperCase();
+  if (raw.length < 4) {
+    document.getElementById('entry-join-err').textContent = 'Please enter a valid code.';
+    return;
+  }
+  myRole = 'guest';
+  joinRoomFromEntry(raw);
+}
+
+function joinRoomFromEntry(code) {
+  showScreen('screen-guest-waiting');
+  const statusEl = document.getElementById('guest-waiting-msg');
+  statusEl.textContent = 'Connecting to host…';
+  statusEl.style.color = '';
+
+  peer = new Peer({ debug: 0 });
+  peer.on('open', () => {
+    conn = peer.connect('npicker-' + code, { reliable: true });
+    conn.on('open', () => {
+      statusEl.textContent = 'Connected! Host is choosing a game…';
+      setupConn();
+    });
+    conn.on('error', () => {
+      statusEl.textContent = '✗ Could not connect. Check the code and try again.';
+      statusEl.style.color = 'var(--warn)';
+    });
+  });
+  peer.on('error', () => {
+    statusEl.textContent = '✗ Connection error. Please try again.';
+    statusEl.style.color = 'var(--warn)';
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SETTINGS MODAL
+// ─────────────────────────────────────────────────────────────────────────────
+function openSettings() {
+  document.getElementById('cat-a-input').value = CATEGORIES[0];
+  document.getElementById('cat-b-input').value = CATEGORIES[1];
+  document.getElementById('cat-c-input').value = CATEGORIES[2];
+  document.getElementById('settings-warn').textContent = '';
+  renderNamesGrid();
+  document.getElementById('settings-modal').classList.add('open');
+}
+function closeSettings() { document.getElementById('settings-modal').classList.remove('open'); }
+
+function renderNamesGrid() {
+  const grid = document.getElementById('names-grid');
+  grid.innerHTML = '';
+  document.getElementById('names-count').textContent = `${NAMES.length} names`;
+  NAMES.forEach(name => {
+    const chip = document.createElement('div');
+    chip.className = 'name-chip';
+    chip.innerHTML = `<span>${name}</span><span class="chip-del" onclick="settingsRemoveName('${name.replace(/'/g, "\\'")}')">×</span>`;
+    grid.appendChild(chip);
+  });
+}
+
+function settingsRemoveName(name) {
+  if (NAMES.length <= 3) { document.getElementById('settings-warn').textContent = 'Need at least 3 names.'; return; }
+  NAMES = NAMES.filter(n => n !== name);
+  document.getElementById('settings-warn').textContent = '';
+  renderNamesGrid();
+}
+
+function settingsAddName() {
+  const input = document.getElementById('new-name-input');
+  const val = input.value.trim();
+  if (!val) return;
+  if (NAMES.map(n=>n.toLowerCase()).includes(val.toLowerCase())) {
+    document.getElementById('settings-warn').textContent = `"${val}" is already in the list.`;
+    return;
+  }
+  NAMES.push(val);
+  input.value = '';
+  document.getElementById('settings-warn').textContent = '';
+  renderNamesGrid();
+}
+
+function settingsSave() {
+  const a = document.getElementById('cat-a-input').value.trim();
+  const b = document.getElementById('cat-b-input').value.trim();
+  const c = document.getElementById('cat-c-input').value.trim();
+  if (!a||!b||!c) { document.getElementById('settings-warn').textContent = 'All three category names are required.'; return; }
+  if (new Set([a.toLowerCase(),b.toLowerCase(),c.toLowerCase()]).size < 3) {
+    document.getElementById('settings-warn').textContent = 'Categories must be unique.'; return;
+  }
+  CATEGORIES = [a, b, c];
+  closeSettings();
+}
+
+function settingsReset() {
+  CATEGORIES = [...DEFAULT_CATEGORIES]; NAMES = [...DEFAULT_NAMES];
+  document.getElementById('cat-a-input').value = CATEGORIES[0];
+  document.getElementById('cat-b-input').value = CATEGORIES[1];
+  document.getElementById('cat-c-input').value = CATEGORIES[2];
+  document.getElementById('settings-warn').textContent = '';
+  renderNamesGrid();
+}
+
+document.getElementById('settings-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeSettings();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('new-name-input').addEventListener('keydown', e => { if (e.key==='Enter') settingsAddName(); });
+  document.getElementById('entry-password-input').addEventListener('keydown', e => { if (e.key==='Enter') submitHostPassword(); });
+  document.getElementById('entry-join-code').addEventListener('keydown', e => { if (e.key==='Enter') submitJoinCode(); });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  RESULT POPUP (solo)
+// ─────────────────────────────────────────────────────────────────────────────
+function showResult(assignments, onPlayAgain) {
+  buildAssignTable('result-assign-table', assignments);
+  document.getElementById('result-play-again-btn').onclick = () => { closeResult(); onPlayAgain(); };
+  document.getElementById('result-overlay').classList.add('open');
+}
+function closeResult() { document.getElementById('result-overlay').classList.remove('open'); }
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
+function randomNames(exclude=[]) {
+  const pool = NAMES.filter(n => !exclude.includes(n));
+  const src = pool.length >= 3 ? pool : [...NAMES];
+  const res = [], copy = [...src];
+  while (res.length < 3 && copy.length) {
+    const idx = Math.floor(Math.random()*copy.length);
+    res.push(copy.splice(idx,1)[0]);
+  }
+  return res;
+}
+
+function buildAssignTable(containerId, assignments) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  CATEGORIES.forEach(cat => {
+    const val = assignments[cat];
+    const row = document.createElement('div');
+    row.className = 'assign-row';
+    row.innerHTML = `<span class="assign-cat">${cat}:</span><span class="assign-val ${val?'filled':'empty'}">${val||'—'}</span>`;
+    el.appendChild(row);
+  });
+}
+
+function buildNameCards(containerId, names, assignments, onAssign, swapsLeft, onSwap) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  names.forEach((name, i) => {
+    const card = document.createElement('div');
+    card.className = 'name-card';
+    if (onSwap !== null) {
+      const x = document.createElement('span');
+      x.className = 'swap-x' + (swapsLeft <= 0 ? ' hidden' : '');
+      x.textContent = '✕'; x.title = 'Swap this name';
+      x.onclick = () => onSwap(i);
+      card.appendChild(x);
+    }
+    const nameLabel = document.createElement('div');
+    nameLabel.className = 'card-name'; nameLabel.textContent = name;
+    card.appendChild(nameLabel);
+    CATEGORIES.forEach(cat => {
+      const opt = document.createElement('span');
+      opt.className = 'radio-opt' + (assignments[cat]===name ? ' selected' : '');
+      opt.textContent = cat; opt.dataset.cat = cat; opt.dataset.cardIdx = i;
+      opt.onclick = () => onAssign(name, cat, i, containerId, assignments, names);
+      card.appendChild(opt);
+    });
+    container.appendChild(card);
+  });
+}
+
+function onAssignGeneric(name, cat, idx, containerId, assignments, names) {
+  for (const c of CATEGORIES) if (assignments[c] === name) assignments[c] = null;
+  for (const c of CATEGORIES) if (c===cat && assignments[c] && assignments[c]!==name) assignments[c]=null;
+  assignments[cat] = name;
+  const container = document.getElementById(containerId);
+  container.querySelectorAll('.radio-opt').forEach(opt => {
+    opt.classList.toggle('selected', assignments[opt.dataset.cat] === names[parseInt(opt.dataset.cardIdx)]);
+  });
+}
+
+function buildCatButtons(containerId, disabledCats, onAssign) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  CATEGORIES.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'btn'; btn.textContent = cat;
+    btn.disabled = disabledCats.includes(cat);
+    btn.onclick = () => onAssign(cat);
+    container.appendChild(btn);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SOLO — ALL AT ONCE
+// ─────────────────────────────────────────────────────────────────────────────
+function soloStart(mode) {
+  if (mode==='all_at_once') { soloAllInit(randomNames()); showScreen('screen-solo-all'); }
+  else { soloOboNewRound(); showScreen('screen-solo-obo'); }
+}
+
+function soloAllInit(names) {
+  soloAllNames=names; soloAllAssignments={}; CATEGORIES.forEach(c=>soloAllAssignments[c]=null); soloAllSwapsLeft=1;
+  document.getElementById('solo-all-swap-label').textContent='SWAPS: 1/1';
+  document.getElementById('solo-all-swap-label').style.color='var(--cyan)';
+  document.getElementById('solo-all-warn').textContent='';
+  buildNameCards('solo-all-cards', soloAllNames, soloAllAssignments,
+    (name,cat,i)=>{ onAssignGeneric(name,cat,i,'solo-all-cards',soloAllAssignments,soloAllNames); buildAssignTable('solo-all-assign-table',soloAllAssignments); },
+    soloAllSwapsLeft, i=>soloAllSwap(i));
+  buildAssignTable('solo-all-assign-table', soloAllAssignments);
+}
+
+function soloAllSwap(idx) {
+  if (soloAllSwapsLeft<=0) return;
+  soloAllSwapsLeft--;
+  document.getElementById('solo-all-swap-label').textContent='SWAPS: 0/1';
+  document.getElementById('solo-all-swap-label').style.color='var(--muted)';
+  for (const c of CATEGORIES) if (soloAllAssignments[c]===soloAllNames[idx]) soloAllAssignments[c]=null;
+  soloAllNames[idx] = randomNames(soloAllNames)[0];
+  buildNameCards('solo-all-cards', soloAllNames, soloAllAssignments,
+    (name,cat,i)=>{ onAssignGeneric(name,cat,i,'solo-all-cards',soloAllAssignments,soloAllNames); buildAssignTable('solo-all-assign-table',soloAllAssignments); },
+    soloAllSwapsLeft, null);
+  buildAssignTable('solo-all-assign-table', soloAllAssignments);
+}
+function soloAllNewRound() { soloAllInit(randomNames()); }
+function soloAllConfirm() {
+  const unset = CATEGORIES.filter(c=>!soloAllAssignments[c]);
+  if (unset.length) { document.getElementById('solo-all-warn').textContent=`Still missing: ${unset.join(', ')}`; return; }
+  showResult({...soloAllAssignments}, soloAllNewRound);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SOLO — ONE BY ONE
+// ─────────────────────────────────────────────────────────────────────────────
+function soloOboNewRound() {
+  soloOboSwapsLeft=1;
+  document.getElementById('solo-obo-swap-label').textContent='SWAPS: 1/1';
+  document.getElementById('solo-obo-swap-label').style.color='var(--cyan)';
+  document.getElementById('solo-obo-swap-x').classList.remove('hidden');
+  soloOboQueue=randomNames(); soloOboAssigned=[]; soloOboAssignments={};
+  CATEGORIES.forEach(c=>soloOboAssignments[c]=null);
+  buildAssignTable('solo-obo-assign-table', soloOboAssignments);
+  soloOboNextName();
+}
+function soloOboNextName() {
+  if (!soloOboQueue.length) { showResult({...soloOboAssignments}, soloOboNewRound); return; }
+  soloOboCurrent = soloOboQueue.shift();
+  document.getElementById('solo-obo-progress').textContent=`Name ${soloOboAssigned.length+1} of 3`;
+  document.getElementById('solo-obo-name').textContent=soloOboCurrent;
+  const usedCats = CATEGORIES.filter(c=>soloOboAssignments[c]);
+  buildCatButtons('solo-obo-cat-btns', usedCats, cat=>{
+    soloOboAssignments[cat]=soloOboCurrent; soloOboAssigned.push(soloOboCurrent);
+    buildAssignTable('solo-obo-assign-table', soloOboAssignments); soloOboNextName();
+  });
+}
+function soloOboSwap() {
+  if (soloOboSwapsLeft<=0) return;
+  const all = soloOboQueue.concat(soloOboAssigned).concat([soloOboCurrent]);
+  const available = NAMES.filter(n=>!all.includes(n));
+  if (!available.length) return;
+  soloOboSwapsLeft--;
+  document.getElementById('solo-obo-swap-label').textContent='SWAPS: 0/1';
+  document.getElementById('solo-obo-swap-label').style.color='var(--muted)';
+  document.getElementById('solo-obo-swap-x').classList.add('hidden');
+  soloOboCurrent = available[Math.floor(Math.random()*available.length)];
+  document.getElementById('solo-obo-name').textContent=soloOboCurrent;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  LOBBY — PEER SETUP
+// ─────────────────────────────────────────────────────────────────────────────
+function randCode() {
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c=''; for (let i=0;i<6;i++) c+=chars[Math.floor(Math.random()*chars.length)]; return c;
+}
+
+function goLobby(mode) {
+  currentMode = mode;
+  const tags = { picker:'PICKER', compare:'COMPARE', guesser:'GUESSER' };
+  document.getElementById('lobby-mode-tag').textContent = tags[mode];
+  if (conn && conn.open) {
+    // Already connected — just show lobby, update status
+    document.getElementById('host-status').textContent = 'Player 2 connected!';
+    document.getElementById('host-status').className = 'status-badge badge-ok mt8';
+    document.getElementById('start-game-btn').disabled = false;
+  } else {
+    startHost();
+  }
+  showScreen('screen-lobby');
+}
+
+function startHost() {
+  const code = randCode();
+  document.getElementById('host-code').textContent = code;
+  document.getElementById('host-status').textContent = 'Waiting for Player 2…';
+  document.getElementById('host-status').className = 'status-badge badge-wait mt8';
+  document.getElementById('start-game-btn').disabled = true;
+  if (peer) { try { peer.destroy(); } catch(e){} }
+  peer = new Peer('npicker-' + code, { debug: 0 });
+  peer.on('error', e => { if (e.type==='unavailable-id') { peer.destroy(); startHost(); } });
+  peer.on('connection', c => {
+    conn = c; setupConn();
+    document.getElementById('host-status').textContent = 'Player 2 connected!';
+    document.getElementById('host-status').className = 'status-badge badge-ok mt8';
+    document.getElementById('start-game-btn').disabled = false;
+  });
+}
+
+function setupConn() {
+  conn.on('data', handleMessage);
+  conn.on('close', () => {
+    conn = null;
+    if (myRole==='host') { alert('Player 2 disconnected.'); showScreen('screen-home'); }
+    else { alert('Host disconnected.'); goHome(); }
+  });
+}
+
+function send(msg) { if (conn && conn.open) conn.send(msg); }
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  COIN FLIP
+// ─────────────────────────────────────────────────────────────────────────────
+function isAsymmetric(mode) { return mode==='picker' || mode==='guesser'; }
+
+function hostStartGame() {
+  const names = randomNames();
+  if (isAsymmetric(currentMode)) {
+    const winner = Math.random() < 0.5 ? 'host' : 'guest';
+    thisGameP1 = winner;
+    // Tell guest to show flip too, then send start after delay
+    send({ type:'coinflip', winner, mode:currentMode, categories:CATEGORIES });
+    showCoinFlipScreen(winner, 'host', () => {
+      const startMsg = { type:'start', mode:currentMode, names, categories:CATEGORIES, p1:winner };
+      send(startMsg);
+      launchGame(names, winner==='host' ? 'host_p1' : 'host_p2');
+    });
+  } else {
+    thisGameP1 = 'host';
+    const startMsg = { type:'start', mode:currentMode, names, categories:CATEGORIES, p1:'host' };
+    send(startMsg);
+    launchGame(names, 'host');
+  }
+}
+
+function showCoinFlipScreen(winner, perspective, callback) {
+  showScreen('screen-coinflip');
+  const coin = document.getElementById('coinflip-coin');
+  const resultEl = document.getElementById('coinflip-result');
+  const winnerEl = document.getElementById('coinflip-winner');
+  const roleDesc = document.getElementById('coinflip-role-desc');
+  const subtitle = document.getElementById('coinflip-subtitle');
+
+  coin.style.animation = 'coinSpin 0.12s linear infinite';
+  coin.style.background = 'conic-gradient(var(--accent) 0deg 180deg, var(--cyan) 180deg 360deg)';
+  coin.style.boxShadow = '0 0 40px rgba(224,64,251,.4)';
+  coin.textContent = '?';
+  resultEl.style.display = 'none';
+  subtitle.textContent = 'Deciding who goes first…';
+
+  setTimeout(() => {
+    coin.style.animation = 'none';
+    coin.style.background = winner==='host' ? 'var(--accent)' : 'var(--cyan)';
+    coin.style.boxShadow = winner==='host'
+      ? '0 0 40px rgba(224,64,251,.6)'
+      : '0 0 40px rgba(0,229,255,.6)';
+    coin.textContent = winner==='host' ? '👑' : '🎮';
+
+    const isMe = (perspective==='host' && winner==='host') || (perspective==='guest' && winner==='guest');
+    winnerEl.textContent = isMe ? 'YOU!' : (perspective==='host' ? 'PLAYER 2' : 'PLAYER 1');
+    winnerEl.style.color = isMe ? 'var(--success)' : 'var(--accent)';
+
+    const modeRoles = {
+      picker:  { p1: 'assign the names', p2: 'watch the reveal' },
+      guesser: { p1: 'assign names secretly', p2: 'try to guess' }
+    };
+    const roles = modeRoles[currentMode] || { p1:'go first', p2:'go second' };
+    roleDesc.textContent = isMe ? `You will ${roles.p1}` : `You will ${roles.p2}`;
+
+    resultEl.style.display = '';
+    subtitle.textContent = 'Here we go!';
+
+    if (callback) setTimeout(callback, 2200);
+  }, 1800);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  MESSAGE ROUTER
+// ─────────────────────────────────────────────────────────────────────────────
+function handleMessage(msg) {
+  switch(msg.type) {
+    case 'host_choosing':
+      document.getElementById('guest-waiting-msg').textContent = 'Host is choosing a game…';
+      document.getElementById('guest-waiting-msg').style.color = '';
+      showScreen('screen-guest-waiting');
+      break;
+    case 'coinflip':
+      currentMode = msg.mode;
+      if (msg.categories) CATEGORIES = msg.categories;
+      // Guest sees coin flip — no callback, start msg will arrive after host's delay
+      showCoinFlipScreen(msg.winner, 'guest', null);
+      break;
+    case 'start':             guestReceiveStart(msg); break;
+    case 'picker_result':     guestReceivePickerResult(msg.assignments); break;
+    case 'picker_new_round':  guestPickerNewRound(msg.names); break;
+    case 'compare_locked':    hostReceiveCompareLocked(msg.assignments); break;
+    case 'compare_result':    guestReceiveCompareResult(msg.p1, msg.p2); break;
+    case 'compare_new':       compareGuestNewRound(msg.names); break;
+    case 'guesser_assigned':  p2ReceiveGuesserAssigned(msg); break;
+    case 'guesser_guesses':   p1ReceiveGuesserGuesses(msg.guesses); break;
+    case 'guesser_new':       p2GuesserNewRound(msg.names); break;
+    case 'request_new_round': if(myRole==='host') handleGuestRequestNew(); break;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  MODE LAUNCH
+// ─────────────────────────────────────────────────────────────────────────────
+// hostPerspective: 'host_p1' | 'host_p2' | 'host' (symmetric)
+function launchGame(names, hostPerspective) {
+  if (currentMode==='picker') {
+    if (hostPerspective==='host_p1') { pickerInit(names); showScreen('screen-picker-host'); }
+    else {
+      // Host is viewer — show guest waiting screen
+      document.getElementById('picker-guest-waiting').textContent='Waiting for Player 2 to assign names…';
+      document.getElementById('picker-guest-waiting').style.display='';
+      document.getElementById('picker-guest-result').style.display='none';
+      document.getElementById('picker-guest-btns').style.display='none';
+      showScreen('screen-picker-guest');
+    }
+  } else if (currentMode==='compare') {
+    compareInit(names,'host'); showScreen('screen-compare');
+  } else if (currentMode==='guesser') {
+    if (hostPerspective==='host_p1') { guesserP1Init(names); showScreen('screen-guesser-p1'); }
+    else {
+      // Host is guesser
+      guesserInitAsP2(names); showScreen('screen-guesser-p2');
+    }
+  }
+}
+
+function guestReceiveStart(msg) {
+  currentMode = msg.mode;
+  if (msg.categories) CATEGORIES = msg.categories;
+  const guestIsP1 = (msg.p1 === 'guest');
+
+  if (msg.mode==='picker') {
+    if (guestIsP1) {
+      pickerInit(msg.names || randomNames());
+      showScreen('screen-picker-host');
+    } else {
+      document.getElementById('picker-guest-waiting').textContent='Waiting for Player 1 to assign names…';
+      document.getElementById('picker-guest-waiting').style.display='';
+      document.getElementById('picker-guest-result').style.display='none';
+      document.getElementById('picker-guest-btns').style.display='none';
+      showScreen('screen-picker-guest');
+    }
+  } else if (msg.mode==='compare') {
+    compareInit(msg.names,'guest'); showScreen('screen-compare');
+  } else if (msg.mode==='guesser') {
+    if (guestIsP1) {
+      guesserP1Init(msg.names || randomNames()); showScreen('screen-guesser-p1');
+    } else {
+      showScreen('screen-guesser-p2');
+      document.getElementById('guesser-p2-waiting').style.display='';
+      document.getElementById('guesser-p2-guess-phase').style.display='none';
+      document.getElementById('guesser-p2-result-phase').style.display='none';
+    }
+  }
+}
+
+function guesserInitAsP2(names) {
+  guesserNames = names;
+  const guessObj={};
+  CATEGORIES.forEach(c=>guessObj[c]=null);
+  document.getElementById('guesser-p2-waiting').style.display='none';
+  document.getElementById('guesser-p2-guess-phase').style.display='';
+  document.getElementById('guesser-p2-result-phase').style.display='none';
+  document.getElementById('guesser-p2-warn').textContent='';
+  buildNameCards('guesser-p2-cards', names, guessObj,
+    (name,cat,i)=>{ onAssignGeneric(name,cat,i,'guesser-p2-cards',guessObj,names); buildAssignTable('guesser-p2-assign-table',guessObj); window._p2GuessObj=guessObj; },
+    0, null);
+  window._p2GuessObj = guessObj;
+  buildAssignTable('guesser-p2-assign-table', guessObj);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  PICKER MP
+// ─────────────────────────────────────────────────────────────────────────────
+function pickerInit(names) {
+  pickerNames=names; pickerAssignments={}; CATEGORIES.forEach(c=>pickerAssignments[c]=null); pickerSwapsLeft=1;
+  document.getElementById('picker-swap-label').textContent='SWAPS: 1/1';
+  document.getElementById('picker-swap-label').style.color='var(--cyan)';
+  document.getElementById('picker-warn').textContent='';
+  document.getElementById('picker-warn').style.color='var(--warn)';
+  buildNameCards('picker-cards',pickerNames,pickerAssignments,
+    (name,cat,i)=>{ onAssignGeneric(name,cat,i,'picker-cards',pickerAssignments,pickerNames); buildAssignTable('picker-assign-table',pickerAssignments); },
+    pickerSwapsLeft, i=>pickerSwap(i));
+  buildAssignTable('picker-assign-table',pickerAssignments);
+}
+function pickerSwap(idx) {
+  if (pickerSwapsLeft<=0) return;
+  pickerSwapsLeft--;
+  document.getElementById('picker-swap-label').textContent='SWAPS: 0/1';
+  document.getElementById('picker-swap-label').style.color='var(--muted)';
+  for(const c of CATEGORIES) if(pickerAssignments[c]===pickerNames[idx]) pickerAssignments[c]=null;
+  pickerNames[idx]=randomNames(pickerNames)[0];
+  buildNameCards('picker-cards',pickerNames,pickerAssignments,
+    (name,cat,i)=>{ onAssignGeneric(name,cat,i,'picker-cards',pickerAssignments,pickerNames); buildAssignTable('picker-assign-table',pickerAssignments); },
+    pickerSwapsLeft, null);
+  buildAssignTable('picker-assign-table',pickerAssignments);
+}
+function pickerNewRound() {
+  const names=randomNames();
+  send({ type:'picker_new_round', names });
+  pickerInit(names);
+}
+function pickerConfirm() {
+  const unset=CATEGORIES.filter(c=>!pickerAssignments[c]);
+  if(unset.length){ document.getElementById('picker-warn').textContent=`Still missing: ${unset.join(', ')}`; return; }
+  send({ type:'picker_result', assignments:pickerAssignments });
+  document.getElementById('picker-warn').style.color='var(--success)';
+  document.getElementById('picker-warn').textContent='✓ Sent!';
+}
+function guestReceivePickerResult(assignments) {
+  document.getElementById('picker-guest-waiting').style.display='none';
+  document.getElementById('picker-guest-result').style.display='';
+  document.getElementById('picker-guest-btns').style.display='';
+  buildAssignTable('picker-guest-assign-table', assignments);
+}
+function guestPickerNewRound(names) {
+  document.getElementById('picker-guest-waiting').style.display='';
+  document.getElementById('picker-guest-result').style.display='none';
+  document.getElementById('picker-guest-btns').style.display='none';
+  document.getElementById('picker-guest-waiting').textContent='Waiting for Player 1 to assign names…';
+}
+function guestRequestNewRound() {
+  send({ type:'request_new_round' });
+  document.getElementById('picker-guest-waiting').style.display='';
+  document.getElementById('picker-guest-waiting').textContent='Asking Player 1 for a new round…';
+  document.getElementById('picker-guest-result').style.display='none';
+  document.getElementById('picker-guest-btns').style.display='none';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  COMPARE MP
+// ─────────────────────────────────────────────────────────────────────────────
+function compareInit(names, role) {
+  compareNames=names; compareMyAssignments={}; compareTheirAssignments={};
+  CATEGORIES.forEach(c=>compareMyAssignments[c]=null);
+  compareMyLocked=false; compareTheirLocked=false; compareSwapsLeft=1;
+  document.getElementById('compare-role-label').textContent = role==='host'?'YOU ARE P1':'YOU ARE P2';
+  document.getElementById('compare-swap-label').textContent='SWAPS: 1/1';
+  document.getElementById('compare-swap-label').style.color='var(--cyan)';
+  document.getElementById('compare-warn').textContent='';
+  document.getElementById('compare-ranking-phase').style.display='';
+  document.getElementById('compare-results-phase').style.display='none';
+  document.getElementById('compare-waiting-other').style.display='none';
+  buildNameCards('compare-cards',compareNames,compareMyAssignments,
+    (name,cat,i)=>{ if(compareMyLocked)return; onAssignGeneric(name,cat,i,'compare-cards',compareMyAssignments,compareNames); buildAssignTable('compare-assign-table',compareMyAssignments); },
+    compareSwapsLeft, i=>compareSwap(i));
+  buildAssignTable('compare-assign-table',compareMyAssignments);
+}
+function compareSwap(idx) {
+  if(compareMyLocked||compareSwapsLeft<=0) return;
+  compareSwapsLeft--;
+  document.getElementById('compare-swap-label').textContent='SWAPS: 0/1';
+  document.getElementById('compare-swap-label').style.color='var(--muted)';
+  for(const c of CATEGORIES) if(compareMyAssignments[c]===compareNames[idx]) compareMyAssignments[c]=null;
+  compareNames[idx]=randomNames(compareNames)[0];
+  if(myRole==='host') send({ type:'compare_swap', names:compareNames });
+  buildNameCards('compare-cards',compareNames,compareMyAssignments,
+    (name,cat,i)=>{ if(compareMyLocked)return; onAssignGeneric(name,cat,i,'compare-cards',compareMyAssignments,compareNames); buildAssignTable('compare-assign-table',compareMyAssignments); },
+    compareSwapsLeft, null);
+  buildAssignTable('compare-assign-table',compareMyAssignments);
+}
+function compareConfirm() {
+  const unset=CATEGORIES.filter(c=>!compareMyAssignments[c]);
+  if(unset.length){ document.getElementById('compare-warn').textContent=`Still missing: ${unset.join(', ')}`; return; }
+  compareMyLocked=true;
+  document.getElementById('compare-warn').textContent='';
+  document.querySelectorAll('#compare-cards .radio-opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('compare-waiting-other').style.display='';
+  if(myRole==='guest') send({ type:'compare_locked', assignments:compareMyAssignments });
+  if(myRole==='host' && compareTheirLocked) showCompareResults();
+}
+function hostReceiveCompareLocked(theirAssignments) {
+  compareTheirAssignments=theirAssignments; compareTheirLocked=true;
+  if(compareMyLocked) showCompareResults();
+}
+function showCompareResults() {
+  document.getElementById('compare-ranking-phase').style.display='none';
+  document.getElementById('compare-results-phase').style.display='';
+  const grid=document.getElementById('compare-results-grid'); grid.innerHTML='';
+  let matches=0;
+  const labels=myRole==='host'?['YOUR PICKS',"P2's PICKS"]:['YOUR PICKS',"P1's PICKS"];
+  const myA=compareMyAssignments, theirA=compareTheirAssignments;
+  [myA,theirA].forEach((a,ci)=>{
+    const col=document.createElement('div'); col.className='compare-col';
+    col.innerHTML=`<div class="compare-col-title">${labels[ci]}</div>`;
+    CATEGORIES.forEach(cat=>{ const item=document.createElement('div'); item.className='compare-item'; item.innerHTML=`<div class="ci-cat">${cat}</div><div class="ci-name">${a[cat]||'—'}</div>`; col.appendChild(item); });
+    grid.appendChild(col);
+  });
+  CATEGORIES.forEach(cat=>{ if(myA[cat]&&myA[cat]===theirA[cat]) matches++; });
+  document.getElementById('compare-match-score').textContent=`${matches}/3`;
+  if(myRole==='host') send({ type:'compare_result', p1:compareMyAssignments, p2:compareTheirAssignments });
+}
+function guestReceiveCompareResult(p1,p2) { compareMyAssignments=p2; compareTheirAssignments=p1; showCompareResults(); }
+function compareNewRound() {
+  if(myRole==='host'){ const n=randomNames(); send({type:'compare_new',names:n}); compareInit(n,'host'); }
+  else { send({type:'request_new_round'}); }
+}
+function compareGuestNewRound(names) { compareInit(names,'guest'); }
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  GUESSER MP
+// ─────────────────────────────────────────────────────────────────────────────
+function guesserP1Init(names) {
+  guesserNames=names; guesserP1Assignments={}; CATEGORIES.forEach(c=>guesserP1Assignments[c]=null); guesserP1SwapsLeft=1;
+  document.getElementById('guesser-p1-swap-label').textContent='SWAPS: 1/1';
+  document.getElementById('guesser-p1-swap-label').style.color='var(--cyan)';
+  document.getElementById('guesser-p1-warn').textContent='';
+  document.getElementById('guesser-p1-assign-phase').style.display='';
+  document.getElementById('guesser-p1-waiting').style.display='none';
+  document.getElementById('guesser-p1-result-phase').style.display='none';
+  buildNameCards('guesser-p1-cards',guesserNames,guesserP1Assignments,
+    (name,cat,i)=>{ onAssignGeneric(name,cat,i,'guesser-p1-cards',guesserP1Assignments,guesserNames); buildAssignTable('guesser-p1-assign-table',guesserP1Assignments); },
+    guesserP1SwapsLeft, i=>guesserP1Swap(i));
+  buildAssignTable('guesser-p1-assign-table',guesserP1Assignments);
+}
+function guesserP1Swap(idx) {
+  if(guesserP1SwapsLeft<=0) return;
+  guesserP1SwapsLeft--;
+  document.getElementById('guesser-p1-swap-label').textContent='SWAPS: 0/1';
+  document.getElementById('guesser-p1-swap-label').style.color='var(--muted)';
+  for(const c of CATEGORIES) if(guesserP1Assignments[c]===guesserNames[idx]) guesserP1Assignments[c]=null;
+  guesserNames[idx]=randomNames(guesserNames)[0];
+  buildNameCards('guesser-p1-cards',guesserNames,guesserP1Assignments,
+    (name,cat,i)=>{ onAssignGeneric(name,cat,i,'guesser-p1-cards',guesserP1Assignments,guesserNames); buildAssignTable('guesser-p1-assign-table',guesserP1Assignments); },
+    guesserP1SwapsLeft, null);
+  buildAssignTable('guesser-p1-assign-table',guesserP1Assignments);
+}
+function guesserP1NewRound() {
+  const names=randomNames(); send({ type:'guesser_new', names }); guesserP1Init(names);
+}
+function guesserP1Confirm() {
+  const unset=CATEGORIES.filter(c=>!guesserP1Assignments[c]);
+  if(unset.length){ document.getElementById('guesser-p1-warn').textContent=`Still missing: ${unset.join(', ')}`; return; }
+  send({ type:'guesser_assigned', names:guesserNames, assignments:guesserP1Assignments });
+  document.getElementById('guesser-p1-assign-phase').style.display='none';
+  document.getElementById('guesser-p1-waiting').style.display='';
+}
+function p1ReceiveGuesserGuesses(guesses) {
+  document.getElementById('guesser-p1-waiting').style.display='none';
+  document.getElementById('guesser-p1-result-phase').style.display='';
+  let score=0;
+  const content=document.getElementById('guesser-p1-result-content'); content.innerHTML='';
+  CATEGORIES.forEach(cat=>{
+    const correct=guesserP1Assignments[cat];
+    const guessed=Object.keys(guesses).find(n=>guesses[n]===cat);
+    const match=correct===guessed; if(match) score++;
+    const row=document.createElement('div'); row.className='guess-result-row';
+    row.innerHTML=`<span class="${match?'tick':'cross'}">${match?'✓':'✗'}</span><span style="color:var(--cyan);min-width:90px;">${cat}:</span><span style="color:var(--muted);">You: <b style="color:var(--text)">${correct}</b></span><span style="color:var(--muted);">P2 guessed: <b style="color:${match?'var(--success)':'var(--warn)'}">${guessed||'?'}</b></span>`;
+    content.appendChild(row);
+  });
+  const scoreEl=document.createElement('div'); scoreEl.className='score-big'; scoreEl.textContent=`${score}/3`;
+  content.appendChild(scoreEl);
+}
+function p2ReceiveGuesserAssigned(msg) {
+  if(msg.names) guesserNames=msg.names;
+  const guessObj={}; CATEGORIES.forEach(c=>guessObj[c]=null);
+  document.getElementById('guesser-p2-waiting').style.display='none';
+  document.getElementById('guesser-p2-guess-phase').style.display='';
+  document.getElementById('guesser-p2-result-phase').style.display='none';
+  document.getElementById('guesser-p2-warn').textContent='';
+  buildNameCards('guesser-p2-cards',guesserNames,guessObj,
+    (name,cat,i)=>{ onAssignGeneric(name,cat,i,'guesser-p2-cards',guessObj,guesserNames); buildAssignTable('guesser-p2-assign-table',guessObj); window._p2GuessObj=guessObj; },
+    0, null);
+  window._p2GuessObj=guessObj;
+  buildAssignTable('guesser-p2-assign-table',guessObj);
+}
+function guesserP2Confirm() {
+  const guessObj=window._p2GuessObj||{};
+  const unset=CATEGORIES.filter(c=>!guessObj[c]);
+  if(unset.length){ document.getElementById('guesser-p2-warn').textContent=`Still missing: ${unset.join(', ')}`; return; }
+  const nameMap={}; CATEGORIES.forEach(c=>{ if(guessObj[c]) nameMap[guessObj[c]]=c; });
+  send({ type:'guesser_guesses', guesses:nameMap });
+  document.getElementById('guesser-p2-guess-phase').style.display='none';
+  document.getElementById('guesser-p2-result-phase').style.display='';
+  document.getElementById('guesser-p2-result-content').innerHTML='<div class="waiting-msg pulse">Waiting for P1 to reveal results…</div>';
+}
+function guesserP2RequestNew() {
+  send({ type:'request_new_round' });
+  document.getElementById('guesser-p2-result-phase').style.display='none';
+  document.getElementById('guesser-p2-waiting').textContent='Asking Player 1 for a new round…';
+  document.getElementById('guesser-p2-waiting').style.display='';
+}
+function p2GuesserNewRound(names) { p2ReceiveGuesserAssigned({ names }); }
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  HOST — handle guest's "new round" request
+// ─────────────────────────────────────────────────────────────────────────────
+function handleGuestRequestNew() {
+  // Return host to menu so they can pick the next game/start a new round with coin flip
+  returnToMenu();
+}
+
+// Multiplayer menu button — host keeps connection, guest waits
+function mpMenu() {
+  if (myRole==='host') returnToMenu();
+  else {
+    showScreen('screen-guest-waiting');
+    document.getElementById('guest-waiting-msg').textContent='Host is choosing a game…';
+    document.getElementById('guest-waiting-msg').style.color='';
+  }
+}
+</script>
+</body>
+</html>

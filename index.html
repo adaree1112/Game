@@ -1065,6 +1065,7 @@ let peer = null, conn = null;
 let myRole = null;       // 'host' | 'guest'
 let currentMode = null;
 let thisGameP1 = null;   // 'host' | 'guest' — resolved after coin flip
+let lastGameP1 = null;   // used to alternate roles each round
 let gameVariant = 'aao'; // 'aao' | 'obo'
 
 // solo
@@ -1249,6 +1250,8 @@ function settingsSave() {
   }
   CATEGORIES = [a, b, c];
   NAMES = names;
+  // If connected as host, sync to guest immediately
+  if (myRole === 'host') send({ type: 'settings_update', names: NAMES, categories: CATEGORIES });
   closeSettings();
 }
 
@@ -1526,14 +1529,25 @@ function isAsymmetric(mode) { return mode==='picker' || mode==='guesser'; }
 function hostStartGame() {
   const names = randomNames();
   if (isAsymmetric(currentMode)) {
-    const winner = Math.random() < 0.5 ? 'host' : 'guest';
-    thisGameP1 = winner;
-    send({ type:'coinflip', winner, mode:currentMode, variant:gameVariant, categories:CATEGORIES });
-    showCoinFlipScreen(winner, 'host', () => {
+    // First game: coin flip. Subsequent rounds: alternate roles.
+    if (lastGameP1 === null) {
+      const winner = Math.random() < 0.5 ? 'host' : 'guest';
+      thisGameP1 = winner;
+      lastGameP1 = winner;
+      send({ type:'coinflip', winner, mode:currentMode, variant:gameVariant, categories:CATEGORIES });
+      showCoinFlipScreen(winner, 'host', () => {
+        const startMsg = { type:'start', mode:currentMode, variant:gameVariant, names, categories:CATEGORIES, p1:winner };
+        send(startMsg);
+        launchGame(names, winner==='host' ? 'host_p1' : 'host_p2');
+      });
+    } else {
+      const winner = lastGameP1 === 'host' ? 'guest' : 'host';
+      thisGameP1 = winner;
+      lastGameP1 = winner;
       const startMsg = { type:'start', mode:currentMode, variant:gameVariant, names, categories:CATEGORIES, p1:winner };
       send(startMsg);
       launchGame(names, winner==='host' ? 'host_p1' : 'host_p2');
-    });
+    }
   } else {
     thisGameP1 = 'host';
     const startMsg = { type:'start', mode:currentMode, variant:gameVariant, names, categories:CATEGORIES, p1:'host' };
@@ -1592,6 +1606,10 @@ function handleMessage(msg) {
       document.getElementById('guest-waiting-msg').textContent = 'Host is choosing a game…';
       document.getElementById('guest-waiting-msg').style.color = '';
       showScreen('screen-guest-waiting');
+      break;
+    case 'settings_update':
+      NAMES = msg.names;
+      CATEGORIES = msg.categories;
       break;
     case 'coinflip':
       currentMode = msg.mode;
@@ -1982,7 +2000,7 @@ function showCompareResults() {
 }
 function guestReceiveCompareResult(p1,p2) { compareMyAssignments=p2; compareTheirAssignments=p1; showCompareResults(); }
 function compareNewRound() {
-  if(myRole==='host'){ const n=randomNames(); send({type:'compare_new',names:n}); compareInit(n,'host'); }
+  if(myRole==='host'){ hostStartGame(); }
   else { send({type:'request_new_round'}); }
 }
 function compareGuestNewRound(names) {
@@ -2055,10 +2073,8 @@ function guesserP2Confirm() {
 }
 
 function guesserP2NewRound() {
-  const names = randomNames();
-  send({ type: 'guesser_new', names });
-  guesserP2Init(names);
-  // P1 gets the names at same time
+  // Route through hostStartGame so roles alternate correctly
+  hostStartGame();
 }
 
 function guesserP2RequestNew() { guesserP2NewRound(); }
@@ -2146,10 +2162,8 @@ function showGuesserResult(containerId, resultRows, score, perspective) {
 //  HOST — handle guest's "new round" request
 // ─────────────────────────────────────────────────────────────────────────────
 function handleGuestRequestNew() {
-  if (currentMode === 'picker') { gameVariant==='obo' ? pickerOboInit() : pickerInit(); }
-  else if (currentMode === 'compare') { const n=randomNames(); send({type:'compare_new',names:n}); gameVariant==='obo' ? compareOboInit(n,'host') : compareInit(n,'host'); }
-  else if (currentMode === 'guesser') guesserP2NewRound();
-  else returnToMenu();
+  // Route through hostStartGame — handles role alternation and name randomisation for all modes
+  hostStartGame();
 }
 
 // Multiplayer menu button — host keeps connection, guest waits
